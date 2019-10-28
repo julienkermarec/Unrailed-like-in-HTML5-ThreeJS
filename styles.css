@@ -40,7 +40,36 @@ button {
   border: 8px solid white;
   box-shadow: -1px 0px 0px 6px rgba(0, 0, 0, 0.35);
 }
-
+#chat-output li {
+  list-style-type: none;
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  float: left;
+}
+#chat-output {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  float: left;
+  width: 250px;
+  height: calc(100vh - 100px);
+  font-size: 15px;
+  padding: 10px 0px;
+}
+#chat-input {
+  display: block;
+  float: left;
+  color: #fff;
+  padding: 10px;
+  font-size: 20px;
+  width: 220px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: #000;
+  border: 2px solid white;
+}
 #menu h1 {
   margin: 0px 0px 10px;
   padding: 0px;
@@ -51,6 +80,12 @@ button {
   width: 100%;
   padding: 10px;
   font-size: 16px;
+}
+#menu_multi {
+  display: none;
+}
+#menu_multi p {
+  font-size: 12px;
 }
 #stats_rocks {
   position: absolute;

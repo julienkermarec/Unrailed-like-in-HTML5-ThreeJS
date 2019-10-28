@@ -52,15 +52,20 @@
         </div>
     </div>
     <div id="chat">
-        <div id="chat-output" style="float: left;     height: calc(100vh - 170px);"></div>
-        <!-- <button id="setup-datachannel" style="float :left ; width : 240px;">Chercher une partie</button> -->
-        <textarea id="chat-input" style="display : none; font-size: 2em; float :left;  width : 240px;"></textarea>
+        <div id="chat-output"></div>
+        <textarea id="chat-input"></textarea>
 
     </div>
     <div id="menu">
         <h1>Unrailed</h1>
-        <button id="start-solo">Partie solo</button>
-        <button id="setup-datachannel">Partie multijoueur</button>
+        <div id="menu_principal">
+            <button id="start-solo">Partie solo</button>
+            <button id="setup-datachannel">Partie multijoueur</button>
+        </div>
+        <div id="menu_multi">
+            <p>Waiting players...</p>
+            <button id="cancel-datachannel">Annuler</button>
+        </div>
     </div>
     <div id="end">
         <button id="retry">Retry</button>
