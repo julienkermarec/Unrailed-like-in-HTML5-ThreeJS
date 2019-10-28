@@ -1,0 +1,116 @@
+@import url("https://fonts.googleapis.com/css?family=Press+Start+2P");
+
+body {
+  margin: 0;
+  font-family: "Press Start 2P", cursive;
+  font-size: 2em;
+  color: white;
+  background-color: #414141;
+}
+
+button {
+  outline: none;
+  cursor: pointer;
+  border: none;
+  box-shadow: 3px 5px 0px 0px rgba(0, 0, 0, 0.75);
+}
+
+#counter {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+#stats_woods {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+#menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -60px;
+  margin-left: -75px;
+  width: 150px;
+  height: 120px;
+  background: blue;
+  padding: 15px;
+  border: 8px solid white;
+  box-shadow: -1px 0px 0px 6px rgba(0, 0, 0, 0.35);
+}
+
+#menu h1 {
+  margin: 0px 0px 10px;
+  padding: 0px;
+  font-size: 16px;
+  text-align: center;
+}
+#menu button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+}
+#stats_rocks {
+  position: absolute;
+  top: 20px;
+  left: 100px;
+}
+
+#chat {
+  position: fixed;
+  z-index: 99;
+  right: 0px;
+  top: 0px;
+  width: 250px;
+  bottom: 0px;
+  background: transparent;
+}
+
+#end {
+  position: absolute;
+  min-width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+}
+
+#end button {
+  background-color: red;
+  padding: 20px 50px 20px 50px;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+#controlls {
+  position: absolute;
+  min-width: auto;
+  min-height: auto;
+  left: 20px;
+  bottom: 0px;
+  right: auto;
+}
+
+#controlls div {
+  display: grid;
+  grid-template-columns: 50px 50px 50px;
+  grid-template-rows: auto auto;
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+  margin-bottom: 20px;
+}
+
+#controlls button {
+  width: 100%;
+  max-width: 50px;
+  background-color: white;
+  border: 1px solid lightgray;
+}
+
+#controlls button:first-of-type {
+  grid-column: 1/-1;
+  margin-left: 60px;
+}
