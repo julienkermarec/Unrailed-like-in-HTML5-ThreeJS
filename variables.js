@@ -8,32 +8,30 @@ const scene = new THREE.Scene();
 const distance = 500;
 const camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 0.1, 10000);
 
-camera.rotation.x = 27 * Math.PI / 180;
-camera.rotation.y = 60 * Math.PI / 180;
+camera.rotation.x = 24 * Math.PI / 180;
+camera.rotation.y = 40 * Math.PI / 180;
 camera.rotation.z = 60 * Math.PI / 180;
 
 console.log("camera.rotation", camera.rotation);
 
-const initialCameraPositionY = -Math.tan(camera.rotation.x) * distance;
-const initialCameraPositionX = Math.tan(camera.rotation.y) * Math.sqrt(distance ** 2 + initialCameraPositionY ** 2);
-camera.position.y = initialCameraPositionX;
-camera.position.x = initialCameraPositionY;
-camera.position.z = distance;
+let initialCameraPositionY = -Math.tan(camera.rotation.x) * distance;
+let initialCameraPositionX = Math.tan(camera.rotation.y) * Math.sqrt(distance ** 2 + initialCameraPositionY ** 2);
 
 const zoom = 2;
 
-const playerSize = 15;
+const playerSize = 12;
 
-const positionWidth = 42;
-const columns = 10;
+const positionWidth = 20;
+const columns = 20;
 const boardWidth = positionWidth * columns;
 
 const stepTime = 200; // Miliseconds it takes for the player to take a step forward, backward, left or right
 
-const initialDirLightPositionX = 50;
-const initialDirLightPositionY = 70;
+const initialDirLightPositionX = 130;
+const initialDirLightPositionY = 100;
 let lanes;
 let train;
+let level_id = 0;
 let colors = {
     rock: 0x414141,
     black: 0x000000,
@@ -54,9 +52,10 @@ let currentColumn;
 let previousTimestamp;
 let startMoving;
 let moves;
+let moves_players;
 let stepStartTimestamp;
 
-const laneTypes = ['forest', 'rock'];
+// const laneTypes = ['forest', 'rock'];
 const laneSpeeds = [2, 2.5, 3];
 const vechicleColors = [0xa52523, 0xbdb638, 0x78b14b];
 const threeHeights = [10];
@@ -85,7 +84,7 @@ const truckFrontTexture = new Texture(30, 30, [{ x: 15, y: 0, w: 10, h: 30 }]);
 const truckRightSideTexture = new Texture(25, 30, [{ x: 0, y: 15, w: 10, h: 10 }]);
 const truckLeftSideTexture = new Texture(25, 30, [{ x: 0, y: 5, w: 10, h: 10 }]);
 
-const generateLanes = () => [-9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(index => {
+const generateLanes = () => [...Array(25).keys()].map(index => {
     const lane = new Lane(index);
     lane.mesh.position.y = index * positionWidth * zoom;
     scene.add(lane.mesh);
@@ -94,7 +93,7 @@ const generateLanes = () => [-9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 
 
 const generateTrain = () => {
     let train = new Train();
-    train.position.x = (position * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2;
+    train.position.x = (4 * positionWidth) * zoom;
     train.position.y = -2 * positionWidth * zoom;
 
     let wagon = new Wagon();
@@ -104,8 +103,7 @@ const generateTrain = () => {
     wagon2 = new Wagon();
     wagon2.position.y = -4 * positionWidth * zoom;
     train.add(wagon2);
-
-    scene.add(train);
+    // train.scale(0.1, 0.1, 0.1);
 
     // let car = new Car();
 

@@ -6,6 +6,7 @@ body {
   font-size: 2em;
   color: white;
   background-color: #414141;
+  overflow: hidden;
 }
 
 button {

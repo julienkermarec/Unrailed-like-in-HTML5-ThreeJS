@@ -10,7 +10,7 @@ var menu = document.getElementById('menu');
 let channel;
 chatInput.onkeypress = function (e) {
     if (e.keyCode != 13) return;
-    channel.send(this.value);
+    channel.send({ 'type': 'message', 'message': this.value });
     chatOutput.innerHTML += '<li>Moi: ' + this.value + '</li>';
     this.value = '';
 };
@@ -40,15 +40,22 @@ startButton.onclick = function () {
         startButton.style.display = 'none';
         chatOutput.innerHTML += '<li>Connecté avec ' + userid + '</li>';
 
+        addPlayer(userid)
         menu.style.display = 'none';
         start();
     };
 
-    channel.onmessage = function (message, userid) {
-        chatOutput.innerHTML += '<li>' + userid + ': ' + message + '</li>';
+    channel.onmessage = (data, userid) => {
+        console.log("on message", userid);
+        if (data.type == 'message')
+            chatOutput.innerHTML += '<li>' + userid + ': ' + data.message + '</li>';
+        else if (data.type == 'move') {
+            startMoving = true;
+            move(data.direction, userid);
+        }
     };
 
-    channel.onleave = function (userid) {
+    channel.onleave = (userid) => {
         chatOutput.innerHTML += '<li>' + userid + ' Left.</li>';
 
         chatInput.style.display = 'none';

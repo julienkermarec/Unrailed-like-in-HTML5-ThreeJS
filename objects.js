@@ -1,42 +1,42 @@
-function Wagon() {
+function Wagon(size = 2, color = 'black') {
     const wagon = new THREE.Group();
 
     const main = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(40 * zoom, 60 * zoom, 4 * zoom),
-        new THREE.MeshPhongMaterial({ color: colors.black, flatShading: false }));
+        new THREE.BoxBufferGeometry(20 * zoom, 30 * zoom, size * zoom),
+        new THREE.MeshPhongMaterial({ color: colors[color], flatShading: false }));
     main.position.z = 20 * zoom;
     main.castShadow = true;
     main.receiveShadow = true;
 
     let bords = [
         {
-            w: 44,
-            h: 8,
-            d: 4,
+            w: 22,
+            h: 4,
+            d: 2,
             x: 0,
-            y: 2,
-            z: 30,
+            y: 1,
+            z: 15,
         }, {
-            w: 44,
-            h: 8,
-            d: 4,
+            w: 22,
+            h: 4,
+            d: 2,
             x: 0,
-            y: 2,
-            z: -30,
+            y: 1,
+            z: -15,
         },
         {
-            w: 4,
-            h: 8,
-            d: 60,
-            x: 20,
-            y: 2,
+            w: 2,
+            h: 4,
+            d: 30,
+            x: 10,
+            y: 1,
             z: 0,
         }, {
-            w: 4,
-            h: 8,
-            d: 60,
-            x: -20,
-            y: 2,
+            w: 2,
+            h: 4,
+            d: 30,
+            x: -10,
+            y: 1,
             z: 0,
         }
     ]
@@ -48,16 +48,16 @@ function Wagon() {
         ba.receiveShadow = true;
         ba.position.x = bord.x * zoom;
         ba.position.z = bord.y * zoom;
-        ba.position.y = bord.z * zoom;
+        ba.position.y = (size + bord.z) * zoom;
         main.add(ba);
     }
     let ad = {
-        w: 4,
-        h: 4,
-        d: 20,
+        w: 2,
+        h: 2,
+        d: 10,
         x: 0,
-        y: 2,
-        z: 41,
+        y: 1,
+        z: 20,
     };
     const attache = new THREE.Mesh(
         new THREE.BoxBufferGeometry(ad.w * zoom, ad.d * zoom, ad.h * zoom),
@@ -66,25 +66,25 @@ function Wagon() {
     attache.receiveShadow = true;
     attache.position.x = ad.x * zoom;
     attache.position.z = ad.y * zoom;
-    attache.position.y = ad.z * zoom;
+    attache.position.y = (size + ad.z) * zoom;
     main.add(attache);
 
     let wheels = [
         {
-            w: 6,
-            h: 3,
-            d: 12,
-            x: 18,
-            y: -19,
-            z: -8,
+            w: 3,
+            h: 1.5,
+            d: 6,
+            x: 9,
+            y: -9.5,
+            z: -4,
         },
         {
-            w: 6,
-            h: 3,
-            d: 12,
-            x: 18,
-            y: 19,
-            z: -8,
+            w: 3,
+            h: 1.5,
+            d: 6,
+            x: 9,
+            y: 9.5,
+            z: -4,
         }
     ];
     for (let wh of wheels) {
@@ -94,7 +94,7 @@ function Wagon() {
 
         wheel.position.x = wh.x * zoom;
         wheel.position.y = wh.y * zoom;
-        wheel.position.z = wh.z * zoom;
+        wheel.position.z = (size + wh.z) * zoom;
         wheel.rotation.z = Math.PI / 2;
         main.add(wheel);
     }
@@ -108,87 +108,7 @@ function Train() {
 
     const wagon = new THREE.Group();
 
-    const main = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(40 * zoom, 60 * zoom, 20 * zoom),
-        new THREE.MeshPhongMaterial({ color: colors.red, flatShading: false }));
-    main.position.z = 30 * zoom;
-    main.castShadow = true;
-    main.receiveShadow = true;
-
-    let bords = [
-        {
-            w: 44,
-            h: 8,
-            d: 4,
-            x: 0,
-            y: 2,
-            z: 30,
-        }, {
-            w: 44,
-            h: 8,
-            d: 4,
-            x: 0,
-            y: 2,
-            z: -30,
-        },
-        {
-            w: 4,
-            h: 8,
-            d: 60,
-            x: 20,
-            y: 2,
-            z: 0,
-        }, {
-            w: 4,
-            h: 8,
-            d: 60,
-            x: -20,
-            y: 2,
-            z: 0,
-        }
-    ]
-    for (let bord of bords) {
-        const ba = new THREE.Mesh(
-            new THREE.BoxBufferGeometry(bord.w * zoom, bord.d * zoom, bord.h * zoom),
-            new THREE.MeshPhongMaterial({ color: colors.rock, flatShading: true }));
-        ba.castShadow = true;
-        ba.receiveShadow = true;
-        ba.position.x = bord.x * zoom;
-        ba.position.z = (bord.y - 10) * zoom;
-        ba.position.y = bord.z * zoom;
-        main.add(ba);
-    }
-
-    let wheels = [
-        {
-            w: 6,
-            h: 3,
-            d: 12,
-            x: 18,
-            y: -19,
-            z: -8,
-        },
-        {
-            w: 6,
-            h: 3,
-            d: 12,
-            x: 18,
-            y: 19,
-            z: -8,
-        }
-    ];
-    for (let wh of wheels) {
-        const wheel = new THREE.Mesh(
-            new THREE.CylinderBufferGeometry(wh.w * zoom, wh.w / 3 * zoom, wh.h * zoom, wh.d * zoom),
-            new THREE.MeshPhongMaterial({ color: colors.black, flatShading: true }));
-
-        wheel.position.x = wh.x * zoom;
-        wheel.position.y = wh.y * zoom;
-        wheel.position.z = (wh.z - 10) * zoom;
-        wheel.rotation.z = Math.PI / 2;
-        main.add(wheel);
-    }
-
+    const main = new Wagon(10, 'red');
     const cabin = new THREE.Mesh(
         new THREE.BoxBufferGeometry(33 * zoom, 24 * zoom, 24 * zoom),
         [
@@ -220,7 +140,6 @@ function Train() {
     main.add(noise);
 
     wagon.add(main);
-
     return wagon;
 }
 
@@ -339,31 +258,47 @@ function Rock() {
     return rock;
 }
 
-function Three() {
-    const three = new THREE.Group();
+function Arbre() {
+    const arbre = new THREE.Group();
 
     const trunk = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(10 * zoom, 10 * zoom, 10 * zoom),
+        new THREE.BoxBufferGeometry(5 * zoom, 5 * zoom, 5 * zoom),
         new THREE.MeshPhongMaterial({ color: 0x4d2926, flatShading: true }));
 
     trunk.position.z = 5 * zoom;
     trunk.castShadow = true;
     trunk.receiveShadow = true;
-    three.add(trunk);
+    arbre.add(trunk);
 
-    const crown = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(15 * zoom, 15 * zoom, 15 * zoom),
-        new THREE.MeshLambertMaterial({ color: 0x7aa21d, flatShading: true }));
+    // Petit cube
+    const cube1 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(9 * zoom, 9 * zoom, 9 * zoom),
+        new THREE.MeshLambertMaterial({ color: 0x9cff00, flatShading: true }));
 
-    crown.position.z = 15 * zoom;
-    crown.castShadow = true;
-    crown.receiveShadow = false;
-    three.add(crown);
+    cube1.position.z = 12 * zoom;
+    cube1.position.x = 3 * zoom;
+    cube1.position.y = -3 * zoom;
+    cube1.castShadow = true;
+    cube1.receiveShadow = false;
+    arbre.add(cube1);
 
-    return three;
+    // Grand cube
+    const cube2 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(11 * zoom, 11 * zoom, 11 * zoom),
+        new THREE.MeshLambertMaterial({ color: 0x9cff00, flatShading: true }));
+
+    cube2.position.z = 14 * zoom;
+    cube2.position.x = -3 * zoom;
+    cube2.position.y = 3 * zoom;
+    cube2.castShadow = true;
+    cube2.receiveShadow = false;
+    arbre.add(cube2);
+    let rotation = Math.floor(Math.random() * 180) + 1;
+    arbre.rotation.z = rotation * Math.PI / 180;
+    return arbre;
 }
 
-function Player() {
+function Player(current_y = null, current_x = null) {
     const player = new THREE.Group();
 
     const body = new THREE.Mesh(
@@ -371,6 +306,8 @@ function Player() {
         new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true }));
 
     body.position.z = 10 * zoom;
+    player.position.x = current_x * positionWidth * zoom;
+    player.position.y = current_y * positionWidth * zoom;
     body.castShadow = true;
     body.receiveShadow = true;
     player.add(body);
@@ -387,12 +324,71 @@ function Player() {
     return player;
 }
 
+function Cell(data) {
+    let color = 0x000000;
+    console.log("data", data);
+
+    let type = data[0];
+    let addon = data[1] ? data[1] : null;
+    let height = 15;
+    if (type == 'g') // gazon
+        color = 0xaeef47;
+    if (type == 'h') // herbe
+        color = 0xfff14b;
+    if (type == 'o') // Orange
+        color = 0xff5b3c;
+    if (type == 'b') // Brown
+        color = 0xaa5252;
+    if (type == 'r') // Rock
+        color = 0xe28b6d;
+    if (type == 'm') // Metal
+        color = 0xe906c6c;
+    if (type == 'w') // Water
+        color = 0x6EFCEE;
+
+    if (type == 'r')
+        height = (positionWidth / 2 + Math.floor(Math.random() * 10)) * zoom;
+    if (type == 'm')
+        height = (positionWidth / 2 + Math.floor(Math.random() * 10)) * zoom;
+    const cellg = new THREE.Group();
+
+    let cell = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(positionWidth * zoom, positionWidth * zoom, height * zoom),
+        new THREE.MeshPhongMaterial({ color: color }));
+    cell.castShadow = true;
+    cell.receiveShadow = true;
+    cell.position.x = 0;
+
+    let default_z = 15;
+    if (type == 'w')
+        default_z = 20;
+
+    cell.position.z = ((height / 2) - default_z) * zoom;
+    // if (type == 'w')
+    //     cell.position.z = -12.5 * zoom;
+    // if (type == 'r')
+    //     cell.position.z = height/2 * zoom;
+    // else
+    //     cell.position.z = -7.5 * zoom;
+
+    cellg.add(cell);
+
+    if (addon != null) {
+        if (addon == 't') {
+            const three = new Arbre();
+            cellg.add(three);
+        }
+    }
+
+
+    return cellg;
+}
 function Grass(index) {
     const grass = new THREE.Group();
 
     const createSection = color => new THREE.Mesh(
         new THREE.BoxBufferGeometry(boardWidth * zoom, positionWidth * zoom, 15 * zoom),
-        new THREE.MeshPhongMaterial({ color }));
+        new THREE.MeshPhongMaterial({ color: (index % 2) == 0 ? 0x000000 : 0xffffff }));
     const createWaterGrass = color => new THREE.Mesh(
         new THREE.BoxBufferGeometry((boardWidth * 0.6) * zoom, positionWidth * zoom, 15 * zoom),
         new THREE.MeshPhongMaterial({ color }));
@@ -401,21 +397,26 @@ function Grass(index) {
         new THREE.MeshPhongMaterial({ color }));
 
     if (index != 4 && index != 5) {
-        let middle = createSection(0xbaf455);
-        middle.receiveShadow = true;
-        middle.position.z = -7 * zoom;
-        grass.add(middle);
+        for (let i = 0; i < columns; i++) {
+            let middle = new THREE.Mesh(
+                new THREE.BoxBufferGeometry(positionWidth * zoom, positionWidth * zoom, 15 * zoom),
+                new THREE.MeshPhongMaterial({ color: (i % 2) == 0 ? 0x000000 : 0xffff00 }));
+            middle.receiveShadow = true;
+            middle.position.z = -7 * zoom;
+            middle.position.x = i * positionWidth * zoom,
+                grass.add(middle);
+        }
     }
     else {
         middle = createWaterGrass(0xbaf455);
         middle.receiveShadow = true;
         middle.position.z = -7 * zoom;
-        middle.position.x = -(positionWidth * 2) * zoom;
+        middle.position.x = 2.5 * positionWidth * zoom;
         grass.add(middle);
 
         middle = createWater(0x6EFCEE);
         middle.receiveShadow = true;
-        middle.position.x = (positionWidth * 3) * zoom;
+        middle.position.x = 7.5 * positionWidth * zoom;
         middle.position.z = -12 * zoom;
         grass.add(middle);
     }
@@ -440,9 +441,9 @@ function Grass(index) {
             new THREE.MeshPhongMaterial({ color }));
         const ground_first = createGroundFirst(0xC4C4C4);
         ground_first.position.y = -positionWidth / 2 * zoom;
-        ground_first.position.z = -(boardWidth / 4) * zoom;
+        ground_first.position.z = 1 * zoom;
         ground_first.receiveShadow = false;
-        grass.add(ground_first);
+        // grass.add(ground_first);
     }
     console.log("index % 10", index, index % 10);
     if (index % 5 == 0) {
@@ -490,8 +491,18 @@ function Grass(index) {
 
 function Lane(index) {
     this.index = index;
-    this.type = index <= 0 ? 'field' : laneTypes[Math.floor(Math.random() * laneTypes.length)];
-
+    this.mesh = new THREE.Group();
+    // this.type = index <= 0 ? 'field' : laneTypes[Math.floor(Math.random() * laneTypes.length)];
+    console.log("levels", levels);
+    console.log("level_id", level_id);
+    for (let i = 0; i < levels[level_id].length; i++) {
+        if (levels[level_id][i][index] && levels[level_id][i][index] != 'e') {
+            let cell = new Cell(levels[level_id][i][index]);
+            cell.position.x = positionWidth * i * zoom;
+            this.mesh.add(cell);
+        }
+    }
+    return;
     switch (this.type) {
         case 'field': {
             this.type = 'field';
@@ -526,7 +537,7 @@ function Lane(index) {
 
             this.occupiedPositions = [];
             this.threes = [1, 2].map(() => {
-                const three = new Three();
+                const three = new Arbre();
                 let position;
                 do {
                     position = Math.floor(Math.random() * (columns - 6));

@@ -2,24 +2,30 @@ const initaliseValues = () => {
 
     lanes = generateLanes();
     train = generateTrain();
+    scene.add(train);
 
-    currentLane = 0;
-    currentColumn = Math.floor(columns / 2);
+    currentLane = 7;
+    currentColumn = 12;
+    level_id = 0;
 
     previousTimestamp = null;
 
     startMoving = false;
     moves = [];
+    moves_players = [];
     stepStartTimestamp;
 
-    player.position.x = 0;
-    player.position.y = 0;
+    player.position.x = currentColumn * positionWidth * zoom;
+    player.position.y = currentLane * positionWidth * zoom;
+    players = [];
 
     camera.position.y = initialCameraPositionY;
     camera.position.x = initialCameraPositionX;
 
+
     dirLight.position.x = initialDirLightPositionX;
     dirLight.position.y = initialDirLightPositionY;
+    // dirLight.target = train;
 };
 
 
@@ -33,6 +39,13 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+document.addEventListener("DOMContentLoaded", function () {
+    var scale = 'scale(1)';
+    document.body.style.zoom = (window.innerWidth / window.outerWidth);
+    document.body.style.webkitTransform = scale;    // Chrome, Opera, Safari
+    document.body.style.msTransform = scale;       // IE 9
+    document.body.style.transform = scale;     // General
+});
 
 document.querySelector("#retry").addEventListener("click", () => {
     lanes.forEach(lane => scene.remove(lane.mesh));
@@ -116,22 +129,6 @@ function action() {
     // console.log(lanes[finalPositions.lane]);
 
     // scene.add(rails);
-
-    // add_objects();
-}
-
-
-function add_objects(x, y) {
-    const mesh = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(playerSize * zoom, playerSize * zoom, 20 * zoom),
-        new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true })
-    );
-    mesh.position.x = (Math.random() - 0.5) * 1000;
-    mesh.position.y = (Math.random() - 0.5) * 1000;
-    mesh.position.z = (Math.random() - 0.5) * 1000;
-    mesh.updateMatrix();
-    mesh.matrixAutoUpdate = false;
-    scene.add(mesh);
 }
 
 function updateCounter() {
@@ -189,7 +186,27 @@ function cutRock(actualPosition, direction) {
     updateCounter();
     return;
 }
-function move(direction) {
+
+function addPlayer(userId) {
+
+    players[userId] = new Player();
+    scene.add(players[userId]);
+
+
+    // const positionX = (2 * positionWidth + positionWidth / 2) * zoom;
+
+    // players[userId].position.x = positionX; // initial player position is 0
+
+}
+function move(direction, userId = null) {
+    if (channel) {
+        if (userId == null) {
+            channel.send({ 'type': 'move', 'direction': direction });
+        }
+        else {
+            return moves_players.push({ userId: userId, direction: direction });
+        }
+    }
     const finalPositions = moves.reduce((position, move) => {
         if (move === 'forward') return { lane: position.lane + 1, column: position.column };
         if (move === 'backward') return { lane: position.lane - 1, column: position.column };
@@ -258,7 +275,11 @@ function move(direction) {
                         if (!stepStartTimestamp) startMoving = true;
                     }
                 }
-    moves.push(direction);
+
+    console.log("dirLight.position.x", dirLight.position.x);
+    console.log("dirLight.position.y", dirLight.position.y);
+    if (userId == null)
+        moves.push(direction);
 }
 
 function animate(timestamp) {
@@ -268,9 +289,12 @@ function animate(timestamp) {
     const delta = timestamp - previousTimestamp;
     previousTimestamp = timestamp;
 
+    dirLight.position.x = initialDirLightPositionX;
+    // console.log("camera.position.y", camera.position.y);
     if (started) {
         // console.log("move train", train);
         train.position.y += 1 / 100 * delta;
+        camera.position.y += 1 / 100 * delta;
     }
 
     if (startMoving) {
@@ -282,41 +306,72 @@ function animate(timestamp) {
         const moveDeltaTime = timestamp - stepStartTimestamp;
         const moveDeltaDistance = Math.min(moveDeltaTime / stepTime, 1) * positionWidth * zoom;
         const jumpDeltaDistance = Math.sin(Math.min(moveDeltaTime / stepTime, 1) * Math.PI) * 8 * zoom;
+        // console.log("moves[0]", moves[0]);
         switch (moves[0]) {
             case 'forward': {
                 const positionY = currentLane * positionWidth * zoom + moveDeltaDistance;
-                camera.position.y = initialCameraPositionY + positionY;
-                dirLight.position.y = initialDirLightPositionY + positionY;
-                player.position.y = positionY; // initial player position is 0
-
+                // dirLight.position.y = initialDirLightPositionY + positionY;
+                player.position.y = positionY;
                 player.position.z = jumpDeltaDistance;
                 break;
             }
             case 'backward': {
-                positionY = currentLane * positionWidth * zoom - moveDeltaDistance;
-                camera.position.y = initialCameraPositionY + positionY;
-                dirLight.position.y = initialDirLightPositionY + positionY;
+                positionY = currentLane * positionWidth * zoom - moveDeltaDistance
+                // dirLight.position.y = initialDirLightPositionY + positionY;
                 player.position.y = positionY;
                 player.position.z = jumpDeltaDistance;
                 break;
             }
             case 'left': {
-                const positionX = (currentColumn * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2 - moveDeltaDistance;
-                camera.position.x = initialCameraPositionX + positionX;
-                dirLight.position.x = initialDirLightPositionX + positionX;
+                const positionX = (currentColumn * positionWidth) * zoom - moveDeltaDistance;
+                // dirLight.position.x = initialDirLightPositionX + positionX;
                 player.position.x = positionX; // initial player position is 0
                 player.position.z = jumpDeltaDistance;
                 break;
             }
             case 'right': {
-                const positionX = (currentColumn * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2 + moveDeltaDistance;
-                camera.position.x = initialCameraPositionX + positionX;
-                dirLight.position.x = initialDirLightPositionX + positionX;
+                const positionX = (currentColumn * positionWidth) * zoom + moveDeltaDistance;
+                // dirLight.position.x = initialDirLightPositionX + positionX;
                 player.position.x = positionX;
                 player.position.z = jumpDeltaDistance;
                 break;
             }
         }
+        // console.log("moves_players", moves_players);
+        // Players move
+        // let counter = 0;
+        // for (let move_data of moves_players) {
+        let move_data = moves_players[0];
+        // counter++;
+        if (move_data != null) {
+            // console.log("move_data", move_data);
+            // console.log("players[move_data.userId]", players[move_data.userId]);
+            switch (move_data.direction) {
+                case 'forward': {
+                    players[move_data.userId].position.y += positionWidth * zoom + moveDeltaDistance;
+                    players[move_data.userId].position.z = jumpDeltaDistance;
+                    break;
+                }
+                case 'backward': {
+                    players[move_data.userId].position.y -= positionWidth * zoom + moveDeltaDistance;
+                    players[move_data.userId].position.z = jumpDeltaDistance;
+                    break;
+                }
+                case 'left': {
+                    players[move_data.userId].position.x -= positionWidth * zoom + moveDeltaDistance;
+                    players[move_data.userId].position.z = jumpDeltaDistance;
+                    break;
+                }
+                case 'right': {
+                    players[move_data.userId].position.x += positionWidth * zoom + moveDeltaDistance;
+                    players[move_data.userId].position.z = jumpDeltaDistance;
+                    break;
+                }
+            }
+
+            moves_players.shift();
+        }
+        // }
 
         // Once a step has ended
         if (moveDeltaTime > stepTime) {
@@ -338,7 +393,6 @@ function animate(timestamp) {
                     break;
                 }
             }
-
             moves.shift();
             // If more steps are to be taken then restart counter otherwise stop stepping
             stepStartTimestamp = moves.length === 0 ? null : timestamp;
@@ -364,10 +418,21 @@ function animate(timestamp) {
 
 function start() {
     started = true;
+    console.log("start");
 }
 
 function init() {
-    player = new Player();
+
+    // initialCameraPositionX += (currentColumn * positionWidth) * zoom;
+    initialCameraPositionY += 100;
+    initialCameraPositionX += 300;
+    camera.position.y = initialCameraPositionX;
+    camera.position.x = initialCameraPositionY;
+    camera.position.z = distance;
+
+    currentLane = 3;
+    currentColumn = columns / 2;
+    player = new Player(currentLane, currentColumn);
     scene.add(player);
 
 
@@ -375,9 +440,8 @@ function init() {
     scene.add(hemiLight);
 
     dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    dirLight.position.set(initialDirLightPositionX, initialDirLightPositionY, 200);
+    dirLight.position.set(initialDirLightPositionX, initialDirLightPositionY, 400);
     dirLight.castShadow = true;
-    dirLight.target = player;
     scene.add(dirLight);
 
     dirLight.shadow.mapSize.width = 2048;
