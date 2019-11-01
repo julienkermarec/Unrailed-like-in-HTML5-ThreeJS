@@ -25,15 +25,25 @@ const positionWidth = 20;
 const columns = 20;
 const boardWidth = positionWidth * columns;
 
-const stepTime = 200; // Miliseconds it takes for the player to take a step forward, backward, left or right
+const stepTime = 150; // Miliseconds it takes for the player to take a step forward, backward, left or right
 
 const initialDirLightPositionX = 130;
 const initialDirLightPositionY = 100;
+
+var stats;
+let player;
+let player_pick;
+let hache;
+let pioche;
 let lanes;
 let train;
+let train_smoke;
+let train_smoke_default;
 let level_id = 0;
 let colors = {
-    rock: 0x414141,
+    rail: 0x414141,
+    rock: 0xe28b6d,
+    metal: 0xe906c6c,
     black: 0x000000,
     red: 0xff3333,
     wheel: 0x333333,
@@ -51,6 +61,8 @@ let currentColumn;
 
 let previousTimestamp;
 let startMoving;
+let direction;
+let directions;
 let moves;
 let moves_players;
 let stepStartTimestamp;
@@ -78,13 +90,14 @@ function Texture(width, height, rects) {
 const carFrontTexture = new Texture(40, 80, [{ x: 0, y: 10, w: 30, h: 60 }]);
 const carBackTexture = new Texture(40, 80, [{ x: 10, y: 10, w: 30, h: 60 }]);
 const carRightSideTexture = new Texture(110, 40, [{ x: 10, y: 0, w: 50, h: 30 }, { x: 70, y: 0, w: 30, h: 30 }]);
-const carLeftSideTexture = new Texture(110, 40, [{ x: 10, y: 10, w: 50, h: 30 }, { x: 70, y: 10, w: 30, h: 30 }]);
+const carLeftSideTexture = new Texture(110, 40, [{ x: 10, y: 10, w: 40, h: 30 }, { x: 60, y: 10, w: 40, h: 30 }]);
 
-const truckFrontTexture = new Texture(30, 30, [{ x: 15, y: 0, w: 10, h: 30 }]);
-const truckRightSideTexture = new Texture(25, 30, [{ x: 0, y: 15, w: 10, h: 10 }]);
-const truckLeftSideTexture = new Texture(25, 30, [{ x: 0, y: 5, w: 10, h: 10 }]);
+const stationFrontTexture = new Texture(30, 30, [{ x: 15, y: 0, w: 10, h: 30 }]);
+const stationBackTexture = new Texture(30, 60, [{ x: 8, y: 3, w: 27, h: 16 }, { x: 5, y: 21, w: 27, h: 18 }, { x: 8, y: 41, w: 27, h: 16 }]);
+const stationLeftSideTexture = new Texture(25, 30, [{ x: 10, y: 0, w: 50, h: 30 }, { x: 70, y: 0, w: 30, h: 30 }]);
+const stationRightSideTexture = new Texture(25, 30, [{ x: 0, y: 5, w: 10, h: 10 }]);
 
-const generateLanes = () => [...Array(25).keys()].map(index => {
+const generateLanes = () => [...Array(40).keys()].map(index => {
     const lane = new Lane(index);
     lane.mesh.position.y = index * positionWidth * zoom;
     scene.add(lane.mesh);
@@ -93,8 +106,8 @@ const generateLanes = () => [...Array(25).keys()].map(index => {
 
 const generateTrain = () => {
     let train = new Train();
-    train.position.x = (4 * positionWidth) * zoom;
-    train.position.y = -2 * positionWidth * zoom;
+    train.position.x = (9 * positionWidth) * zoom;
+    train.position.y = 8 * positionWidth * zoom;
 
     let wagon = new Wagon();
     wagon.position.y = -2 * positionWidth * zoom;

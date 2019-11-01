@@ -2,16 +2,26 @@ const initaliseValues = () => {
 
     lanes = generateLanes();
     train = generateTrain();
+    train_smoke = new Smoke();
+    train_smoke_default = new Smoke();
+    train.add(train_smoke);
+    console.log(train_smoke);
     scene.add(train);
 
+    menu.style.display = 'none';
+    start();
     currentLane = 7;
     currentColumn = 12;
+    currentLane = 3;
+    currentColumn = 8;
     level_id = 0;
+    player_pick = [];
 
     previousTimestamp = null;
 
     startMoving = false;
     moves = [];
+    directions = [];
     moves_players = [];
     stepStartTimestamp;
 
@@ -28,11 +38,21 @@ const initaliseValues = () => {
     // dirLight.target = train;
 };
 
-
 const renderer = new THREE.WebGLRenderer({
     alpha: true,
     antialias: true
 });
+
+function createStats() {
+    var stats = new Stats();
+    stats.setMode(0);
+
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.left = '0';
+    stats.domElement.style.top = '0';
+
+    return stats;
+}
 
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -75,6 +95,9 @@ window.addEventListener("keydown", event => {
     if (event.keyCode == '32') {
         action();
     }
+    else if (event.keyCode == '16') {
+        pick();
+    }
     else if (event.keyCode == '38') {
         // up arrow
         // move('forward');
@@ -94,38 +117,86 @@ window.addEventListener("keydown", event => {
     }
 });
 
+function pick() {
+    console.log("pick", levels[level_id][currentColumn][currentLane]);
+    if (!started)
+        return;
+    type = levels[level_id][currentColumn][currentLane][1];
+    type_color = (type == 'b' ? 0xaa5252 : colors.metal);
+    if (type == 'b' || type == 'p') {
+        if (player_pick.length >= 3 || player_pick.length > 0 && player_pick[0] != type)
+            return;
+        levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane][0];
+        lanes[currentLane].mesh.children[currentColumn].children[1].position.z = -45;
+        player_pick.push('type');
+        console.log("player pick", player)
+        // player.children[3].rotation.z = Math.PI / 2;
+        // BRAS PICK
+        player.children[2].children[1].rotation.x = Math.PI / 2;
+        player.children[2].children[1].rotation.y = Math.PI / 2;
+        player.children[2].children[1].position.x = 10;
+        player.children[2].children[0].rotation.x = Math.PI / 2;
+        player.children[2].children[0].rotation.y = Math.PI / 2;
+        player.children[2].children[0].position.x = 10;
+        if (player_pick.length == 1) {
+            player.children[2].children[2].visible = true;
+            player.children[2].children[3].visible = true;
+            player.children[2].children[2].material.color.setHex(type_color);
+            player.children[2].children[3].material.color.setHex(type_color);
+        }
+        if (player_pick.length == 2) {
+            player.children[2].children[4].visible = true;
+            player.children[2].children[5].visible = true;
+            player.children[2].children[4].material.color.setHex(type_color);
+            player.children[2].children[5].material.color.setHex(type_color);
+        }
+        if (player_pick.length == 3) {
+            player.children[2].children[6].visible = true;
+            player.children[2].children[7].visible = true;
+            player.children[2].children[6].material.color.setHex(type_color);
+            player.children[2].children[7].material.color.setHex(type_color);
+        }
+    }
+}
+
 function action() {
     if (!started)
         return;
-    const finalPositions = moves.reduce((position, move) => {
-        if (move === 'forward') return { lane: position.lane + 1, column: position.column };
-        if (move === 'backward') return { lane: position.lane - 1, column: position.column };
-        if (move === 'left') return { lane: position.lane, column: position.column - 1 };
-        if (move === 'right') return { lane: position.lane, column: position.column + 1 };
-    }, { lane: currentLane, column: currentColumn });
-    console.log("action finalPositions", finalPositions);
-    console.log("action counter.rails", counter.rails + 1);
-    if (finalPositions.column != 7 || finalPositions.lane !== (counter.rails + 1))
-        return;
 
-    if (counter.rocks < 10 || counter.woods < 10)
+    function getCell() {
+        if (direction === 'forward') return { lane: currentLane + 1, column: currentColumn };
+        if (direction === 'backward') return { lane: currentLane - 1, column: currentColumn };
+        if (direction === 'left') return { lane: currentLane, column: currentColumn - 1 };
+        if (direction === 'right') return { lane: currentLane, column: currentColumn + 1 };
+    }
+    nextCell = getCell();
+    if (nextCell.column < 0 || nextCell.column >= columns || nextCell.lane < 0)
         return;
-    const rails = new Rails();
-    let position_x = finalPositions.column;
-    console.log("rails.position", rails.position);
-    rails.position.x = (position_x * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2;
-    rails.position.y = (finalPositions.lane * positionWidth * zoom);
+    console.log("action nextCell", nextCell);
+    console.log("action direction", direction);
+    console.log("action", levels[level_id][nextCell.column][nextCell.lane]);
+    if (levels[level_id][nextCell.column][nextCell.lane][1] == 't')
+        return cutForest(nextCell.column, nextCell.lane);
+    if (levels[level_id][nextCell.column][nextCell.lane][1] == 'r')
+        return cutRock(nextCell.column, nextCell.lane);
+    // if (counter.rocks < 10 || counter.woods < 10)
+    //     return;
+    // const rails = new Rails();
+    // let position_x = finalPositions.column;
+    // console.log("rails.position", rails.position);
+    // rails.position.x = (position_x * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2;
+    // rails.position.y = (finalPositions.lane * positionWidth * zoom);
 
-    console.log("rails.position after", rails.position);
-    rails.updateMatrix();
-    rails.matrixAutoUpdate = false;
-    setTimeout(() => {
-        scene.add(rails);
-        counter.rails++;
-        counter.rocks -= 10;
-        counter.woods -= 10;
-        updateCounter();
-    }, 0, 20);
+    // console.log("rails.position after", rails.position);
+    // rails.updateMatrix();
+    // rails.matrixAutoUpdate = false;
+    // setTimeout(() => {
+    //     scene.add(rails);
+    //     counter.rails++;
+    //     counter.rocks -= 10;
+    //     counter.woods -= 10;
+    //     updateCounter();
+    // }, 0, 20);
     // console.log(lanes[finalPositions.lane]);
 
     // scene.add(rails);
@@ -136,54 +207,62 @@ function updateCounter() {
     statsWoodsDOM.innerHTML = counter.woods;
     counterDOM.innerHTML = counter.rails;
 }
-function cutForest(actualPosition, direction) {
+function cutForest(column, lane) {
+    console.log("cutForest currentColumn", currentColumn, column);
+    console.log("cutForest currentLane", currentLane, lane);
     if (!started)
         return;
-    let finalPosition = {};
-    if (direction == 'forward')
-        finalPosition = { lane: actualPosition.lane + 1, column: actualPosition.column, index: null };
-    if (direction == 'backward')
-        finalPosition = { lane: actualPosition.lane - 1, column: actualPosition.column, index: null };
-    if (direction == 'left')
-        finalPosition = { lane: actualPosition.lane, column: actualPosition.column - 1, index: null };
-    if (direction == 'right')
-        finalPosition = { lane: actualPosition.lane, column: actualPosition.column + 1, index: null };
-
-    finalPosition.index = lanes[finalPosition.lane].occupiedPositions.indexOf(finalPosition.column);
-
-    console.log("lanes[finalPosition.lane]", lanes[finalPosition.lane]);
-    if (lanes[finalPosition.lane].threes[finalPosition.index].position.z <= -45) {
-        delete lanes[finalPosition.lane].occupiedPositions[finalPosition.index];
-        return;
+    console.log("lanes[lane].mesh.children[column].children[1].position.z ", lanes[lane].mesh.children[column].children[1].position.z);
+    console.log("levels[level_id][column][lane]", levels[level_id][column][lane]);
+    if (lanes[lane].mesh.children[column].children[1].position.z > -34) {
+        lanes[lane].mesh.children[column].children[1].position.z -= 7;
+        updateCounter();
     }
-
-    lanes[finalPosition.lane].threes[finalPosition.index].position.z--;
-    counter.woods++;
-    updateCounter();
+    else {
+        lanes[lane].mesh.children[column].children[1].position.z = -40;
+        levels[level_id][column][lane] = levels[level_id][column][lane][0] + 'b';
+        lanes[lane].mesh.children[column].children[1].children[0].position.z = 42;
+        lanes[lane].mesh.children[column].children[1].children[0].position.y = 4;
+        lanes[lane].mesh.children[column].children[1].children[0].scale.x = 2.5;
+        lanes[lane].mesh.children[column].children[1].children[0].scale.z = 0.3;
+        lanes[lane].mesh.children[column].children[1].children[1].position.z = 42;
+        lanes[lane].mesh.children[column].children[1].children[1].position.y = -9;
+        lanes[lane].mesh.children[column].children[1].children[1].scale.x = 2.5;
+        lanes[lane].mesh.children[column].children[1].children[1].scale.z = 0.3;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.z = 0.1;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.x = 0.1;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.y = 0.1;
+        // lanes[lane].mesh.children[column].children[1].children[1].scale.x = 3;
+    }
     return;
 }
-function cutRock(actualPosition, direction) {
+function cutRock(column, lane) {
+    console.log("cutForest currentColumn", currentColumn, column);
+    console.log("cutForest currentLane", currentLane, lane);
     if (!started)
         return;
-    let finalPosition = {};
-    if (direction == 'forward')
-        finalPosition = { lane: actualPosition.lane + 1, column: actualPosition.column, index: null };
-    if (direction == 'backward')
-        finalPosition = { lane: actualPosition.lane - 1, column: actualPosition.column, index: null };
-    if (direction == 'left')
-        finalPosition = { lane: actualPosition.lane, column: actualPosition.column - 1, index: null };
-    if (direction == 'right')
-        finalPosition = { lane: actualPosition.lane, column: actualPosition.column + 1, index: null };
-
-    finalPosition.index = lanes[finalPosition.lane].occupiedPositions.indexOf(finalPosition.column);
-    if (lanes[finalPosition.lane].rocks[finalPosition.index].position.z <= -40) {
-        delete lanes[finalPosition.lane].occupiedPositions[finalPosition.index];
-        return;
+    console.log("lanes[lane].mesh.children[column].children[1].position.z ", lanes[lane].mesh.children[column].children[1].position.z);
+    console.log("levels[level_id][column][lane]", levels[level_id][column][lane]);
+    if (lanes[lane].mesh.children[column].children[1].position.z > -34) {
+        lanes[lane].mesh.children[column].children[1].position.z -= 7;
+        updateCounter();
     }
-
-    lanes[finalPosition.lane].rocks[finalPosition.index].position.z--;
-    counter.rocks++;
-    updateCounter();
+    else {
+        lanes[lane].mesh.children[column].children[1].position.z = -40;
+        levels[level_id][column][lane] = levels[level_id][column][lane][0] + 'p';
+        lanes[lane].mesh.children[column].children[1].children[0].position.z = 42;
+        lanes[lane].mesh.children[column].children[1].children[0].position.y = 4;
+        lanes[lane].mesh.children[column].children[1].children[0].scale.x = 2.5;
+        lanes[lane].mesh.children[column].children[1].children[0].scale.z = 0.3;
+        lanes[lane].mesh.children[column].children[1].children[1].position.z = 42;
+        lanes[lane].mesh.children[column].children[1].children[1].position.y = -9;
+        lanes[lane].mesh.children[column].children[1].children[1].scale.x = 2.5;
+        lanes[lane].mesh.children[column].children[1].children[1].scale.z = 0.3;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.z = 0.1;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.x = 0.1;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.y = 0.1;
+        // lanes[lane].mesh.children[column].children[1].children[1].scale.x = 3;
+    }
     return;
 }
 
@@ -198,7 +277,12 @@ function addPlayer(userId) {
     // players[userId].position.x = positionX; // initial player position is 0
 
 }
-function move(direction, userId = null) {
+
+function setDirections(next_direction) {
+    directions.push(next_direction)
+}
+function move(pdirection, userId = null) {
+    direction = pdirection;
     if (channel) {
         if (userId == null) {
             channel.send({ 'type': 'move', 'direction': direction });
@@ -214,72 +298,72 @@ function move(direction, userId = null) {
         if (move === 'right') return { lane: position.lane, column: position.column + 1 };
     }, { lane: currentLane, column: currentColumn });
     console.log("-------");
-    console.log("finalPositions.lane", finalPositions.lane);
     console.log("direction", direction);
+    console.log("direction", direction);
+
+    can_walk_ground = ['e', 'w']
+    can_walk_addon = ['t', 'r', 'm'];
 
     if (direction === 'forward') {
         if (finalPositions.lane < 0) {
             if (!stepStartTimestamp) { startMoving = true; }
         }
         else {
-            if (lanes[finalPositions.lane + 1].type === 'forest' && lanes[finalPositions.lane + 1].occupiedPositions.indexOf(finalPositions.column) !== -1)
-                return cutForest(finalPositions, 'forward');
-            if (lanes[finalPositions.lane + 1].type === 'rock' && lanes[finalPositions.lane + 1].occupiedPositions.indexOf(finalPositions.column) !== -1)
-                return cutRock(finalPositions, 'forward');
-            if (!stepStartTimestamp) startMoving = true;
+            console.log("next cell", levels[level_id][finalPositions.column][finalPositions.lane + 1]);
+            if (can_walk_ground.indexOf(levels[level_id][finalPositions.column][finalPositions.lane + 1][0]) !== -1)
+                return setDirections('forward');
+            if (can_walk_addon.indexOf(levels[level_id][finalPositions.column][finalPositions.lane + 1][1]) !== -1)
+                return setDirections('forward');
+            if (!stepStartTimestamp)
+                startMoving = true;
             addLane();
         }
-    } else
-        if (direction === 'backward') {
-            // console.log("finalPositions.lane", finalPositions.lane);
-            // console.log("lanes[finalPositions.lane - 1].type", lanes[finalPositions.lane - 1].type);
-            if (finalPositions.lane < -8)
-                return;
-            else if (finalPositions.lane <= 0) {
-                if (!stepStartTimestamp) { startMoving = true; }
-            }
-            else {
-                console.log("lanes", lanes);
-                console.log("finalPositions.lane", finalPositions.lane);
-                if (lanes[finalPositions.lane - 1].type === 'forest' && lanes[finalPositions.lane - 1].occupiedPositions.indexOf(finalPositions.column) !== -1)
-                    return cutForest(finalPositions, 'backward');
-                if (lanes[finalPositions.lane - 1].type === 'rock' && lanes[finalPositions.lane - 1].occupiedPositions.indexOf(finalPositions.column) !== -1)
-                    return cutRock(finalPositions, 'backward');
-                if (!stepStartTimestamp)
-                    startMoving = true;
-            }
-        } else
-            if (direction === 'left') {
-                if (finalPositions.column === 0) return;
-                if (finalPositions.lane < 0) {
-                    if (!stepStartTimestamp) { startMoving = true; }
-                }
-                else {
-                    if (lanes[finalPositions.lane].type === 'forest' && lanes[finalPositions.lane].occupiedPositions.indexOf(finalPositions.column - 1) !== -1)
-                        return cutForest(finalPositions, 'left');
-                    if (lanes[finalPositions.lane].type === 'rock' && lanes[finalPositions.lane].occupiedPositions.indexOf(finalPositions.column - 1) !== -1)
-                        return cutRock(finalPositions, 'left');
-                    if (!stepStartTimestamp) startMoving = true;
-                }
-            } else
-                if (direction === 'right') {
-                    if (finalPositions.column === columns - 1) return;
-                    if (finalPositions.lane < 0) {
-                        if (!stepStartTimestamp) { startMoving = true; }
-                    }
-                    else {
-                        if (lanes[finalPositions.lane].type === 'forest' && lanes[finalPositions.lane].occupiedPositions.indexOf(finalPositions.column + 1) !== -1)
-                            return cutForest(finalPositions, 'right');
-                        if (lanes[finalPositions.lane].type === 'rock' && lanes[finalPositions.lane].occupiedPositions.indexOf(finalPositions.column + 1) !== -1)
-                            return cutRock(finalPositions, 'right');
-                        if (!stepStartTimestamp) startMoving = true;
-                    }
-                }
+    } else if (direction === 'backward') {
+        if (finalPositions.lane <= 0) {
+            if (!stepStartTimestamp) { startMoving = true; }
+        }
+        else {
+            console.log("next cell", levels[level_id][finalPositions.column][finalPositions.lane - 1]);
+            if (can_walk_ground.indexOf(levels[level_id][finalPositions.column][finalPositions.lane - 1][0]) !== -1)
+                return setDirections('backward');
+            if (can_walk_addon.indexOf(levels[level_id][finalPositions.column][finalPositions.lane - 1][1]) !== -1)
+                return setDirections('backward');
+            if (!stepStartTimestamp)
+                startMoving = true;
+        }
+    } else if (direction === 'left') {
+        if (finalPositions.column === 0) return;
+        if (finalPositions.lane < 0) {
+            if (!stepStartTimestamp) { startMoving = true; }
+        }
+        else {
+            console.log("next cell", levels[level_id][finalPositions.column - 1][finalPositions.lane]);
+            if (can_walk_ground.indexOf(levels[level_id][finalPositions.column - 1][finalPositions.lane][0]) !== -1)
+                return setDirections('left');
+            if (can_walk_addon.indexOf(levels[level_id][finalPositions.column - 1][finalPositions.lane][1]) !== -1)
+                return setDirections('left');
+            if (!stepStartTimestamp) startMoving = true;
+        }
+    } else if (direction === 'right') {
+        if (finalPositions.column === columns - 1) return;
+        if (finalPositions.lane < 0) {
+            if (!stepStartTimestamp) { startMoving = true; }
+        }
+        else {
+            console.log("next cell", levels[level_id][finalPositions.column + 1][finalPositions.lane]);
+            if (can_walk_ground.indexOf(levels[level_id][finalPositions.column + 1][finalPositions.lane][0]) !== -1)
+                return setDirections('right');
+            if (can_walk_addon.indexOf(levels[level_id][finalPositions.column + 1][finalPositions.lane][1]) !== -1)
+                return setDirections('right');
+            if (!stepStartTimestamp) startMoving = true;
+        }
+    }
 
     console.log("dirLight.position.x", dirLight.position.x);
     console.log("dirLight.position.y", dirLight.position.y);
-    if (userId == null)
+    if (userId == null) {
         moves.push(direction);
+    }
 }
 
 function animate(timestamp) {
@@ -294,6 +378,23 @@ function animate(timestamp) {
     if (started) {
         // console.log("move train", train);
         train.position.y += 1 / 100 * delta;
+        train_smoke.position.z += 1 / 500 * delta;
+        train_smoke.position.y -= 1 / 100 * delta;
+        train_smoke.scale.x += 1 / 4000 * delta;
+        train_smoke.scale.y += 1 / 4000 * delta;
+        train_smoke.scale.z += 1 / 4000 * delta;
+        train_smoke.children[0].material.opacity -= 1 / 3000 * delta;
+        // console.log("train_smoke.children[0].material.opacity", train_smoke.children[0].material.opacity);
+        if (train_smoke.children[0].material.opacity < 0) {
+            // console.log("train_smoke_default", train_smoke_default);
+            train_smoke.children[0].material.opacity = 0.99;
+            train_smoke.position.z = train_smoke_default.position.z;
+            train_smoke.position.y = train_smoke_default.position.y;
+            train_smoke.scale.x = train_smoke_default.scale.x;
+            train_smoke.scale.y = train_smoke_default.scale.y;
+            train_smoke.scale.z = train_smoke_default.scale.z;
+        }
+
         camera.position.y += 1 / 100 * delta;
     }
 
@@ -313,6 +414,7 @@ function animate(timestamp) {
                 // dirLight.position.y = initialDirLightPositionY + positionY;
                 player.position.y = positionY;
                 player.position.z = jumpDeltaDistance;
+                player.rotation.z = Math.PI / 2;
                 break;
             }
             case 'backward': {
@@ -320,6 +422,7 @@ function animate(timestamp) {
                 // dirLight.position.y = initialDirLightPositionY + positionY;
                 player.position.y = positionY;
                 player.position.z = jumpDeltaDistance;
+                player.rotation.z = -Math.PI / 2;
                 break;
             }
             case 'left': {
@@ -327,6 +430,7 @@ function animate(timestamp) {
                 // dirLight.position.x = initialDirLightPositionX + positionX;
                 player.position.x = positionX; // initial player position is 0
                 player.position.z = jumpDeltaDistance;
+                player.rotation.z = Math.PI;
                 break;
             }
             case 'right': {
@@ -334,6 +438,7 @@ function animate(timestamp) {
                 // dirLight.position.x = initialDirLightPositionX + positionX;
                 player.position.x = positionX;
                 player.position.z = jumpDeltaDistance;
+                player.rotation.z = 0;
                 break;
             }
         }
@@ -398,6 +503,32 @@ function animate(timestamp) {
             stepStartTimestamp = moves.length === 0 ? null : timestamp;
         }
     }
+    else {
+
+
+        if (directions[0] != null) {
+            console.log("directions[0]", directions[0]);
+            switch (directions[0]) {
+                case 'forward': {
+                    player.rotation.z = Math.PI / 2;
+                    break;
+                }
+                case 'backward': {
+                    player.rotation.z = -Math.PI / 2;
+                    break;
+                }
+                case 'left': {
+                    player.rotation.z = Math.PI;
+                    break;
+                }
+                case 'right': {
+                    player.rotation.z = 0;
+                    break;
+                }
+            }
+            directions.shift();
+        }
+    }
 
     // if (lanes[currentLane].type === 'car' || lanes[currentLane].type === 'truck') {
     //     const playerMinX = player.position.x - playerSize * zoom / 2;
@@ -413,6 +544,7 @@ function animate(timestamp) {
 
     // }
     renderer.render(scene, camera);
+    stats.update();
 }
 
 
@@ -423,8 +555,11 @@ function start() {
 
 function init() {
 
+    stats = createStats();
+    document.body.appendChild(stats.domElement);
+
     // initialCameraPositionX += (currentColumn * positionWidth) * zoom;
-    initialCameraPositionY += 100;
+    initialCameraPositionY += 600;
     initialCameraPositionX += 300;
     camera.position.y = initialCameraPositionX;
     camera.position.x = initialCameraPositionY;

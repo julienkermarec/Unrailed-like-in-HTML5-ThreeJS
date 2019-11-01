@@ -1,0 +1,22 @@
+{
+  "name": "unrailed",
+  "version": "1.0.0",
+  "description": "HTML5 Unrailed like game with ThreeJS",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julienkermarec/Unrailed-like-in-HTML5-ThreeJS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/julienkermarec/Unrailed-like-in-HTML5-ThreeJS/issues"
+  },
+  "homepage": "https://github.com/julienkermarec/Unrailed-like-in-HTML5-ThreeJS#readme",
+  "dependencies": {
+    "stats.js": "^0.17.0"
+  }
+}
