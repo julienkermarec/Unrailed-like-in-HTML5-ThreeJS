@@ -294,15 +294,17 @@ function Wagon(size = 2, color = 'black') {
         y: 1,
         z: 20,
     };
-    const attache = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(ad.w * zoom, ad.d * zoom, ad.h * zoom),
-        new THREE.MeshPhongMaterial({ color: colors.gray, flatShading: true }));
-    attache.castShadow = true;
-    attache.receiveShadow = true;
-    attache.position.x = ad.x * zoom;
-    attache.position.z = ad.y * zoom;
-    attache.position.y = (0 + ad.z) * zoom;
-    main.add(attache);
+    if (color != 'red') {
+        const attache = new THREE.Mesh(
+            new THREE.BoxBufferGeometry(ad.w * zoom, ad.d * zoom, ad.h * zoom),
+            new THREE.MeshPhongMaterial({ color: colors.gray, flatShading: true }));
+        attache.castShadow = true;
+        attache.receiveShadow = true;
+        attache.position.x = ad.x * zoom;
+        attache.position.z = ad.y * zoom;
+        attache.position.y = (0 + ad.z) * zoom;
+        main.add(attache);
+    }
 
     let wheels = [
         {

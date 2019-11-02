@@ -302,7 +302,7 @@ function move(pdirection, userId = null) {
     console.log("direction", direction);
 
     can_walk_ground = ['e', 'w']
-    can_walk_addon = ['t', 'r', 'm'];
+    can_walk_addon = ['t', 'r', 'm', 's', 'd'];
 
     if (direction === 'forward') {
         if (finalPositions.lane < 0) {
