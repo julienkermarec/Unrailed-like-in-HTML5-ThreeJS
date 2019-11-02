@@ -92,10 +92,11 @@ document.getElementById('right').addEventListener("click", () => move('forward')
 
 window.addEventListener("keydown", event => {
     console.log("event.keyCode", event.keyCode);
+
+    // else if (event.keyCode == '16') {
+    //     pick();
+    // }s
     if (event.keyCode == '32') {
-        action();
-    }
-    else if (event.keyCode == '16') {
         pick();
     }
     else if (event.keyCode == '38') {
@@ -119,6 +120,8 @@ window.addEventListener("keydown", event => {
 
 function pick() {
     console.log("pick", levels[level_id][currentColumn][currentLane]);
+
+    console.log("player pick", player_pick)
     if (!started)
         return;
     type = levels[level_id][currentColumn][currentLane][1];
@@ -128,7 +131,7 @@ function pick() {
             return;
         levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane][0];
         lanes[currentLane].mesh.children[currentColumn].children[1].position.z = -45;
-        player_pick.push('type');
+        player_pick.push(type);
         console.log("player pick", player)
         // player.children[3].rotation.z = Math.PI / 2;
         // BRAS PICK
@@ -279,6 +282,7 @@ function addPlayer(userId) {
 }
 
 function setDirections(next_direction) {
+    action();
     directions.push(next_direction)
 }
 function move(pdirection, userId = null) {
@@ -396,6 +400,8 @@ function animate(timestamp) {
         }
 
         camera.position.y += 1 / 100 * delta;
+
+        // scene.translateY(1 / 100 * delta * -1);
     }
 
     if (startMoving) {
