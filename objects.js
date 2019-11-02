@@ -294,17 +294,16 @@ function Wagon(size = 2, color = 'black') {
         y: 1,
         z: 20,
     };
-    if (color != 'red') {
-        const attache = new THREE.Mesh(
-            new THREE.BoxBufferGeometry(ad.w * zoom, ad.d * zoom, ad.h * zoom),
-            new THREE.MeshPhongMaterial({ color: colors.gray, flatShading: true }));
-        attache.castShadow = true;
-        attache.receiveShadow = true;
-        attache.position.x = ad.x * zoom;
-        attache.position.z = ad.y * zoom;
-        attache.position.y = (0 + ad.z) * zoom;
-        main.add(attache);
-    }
+    const attache = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(ad.w * zoom, ad.d * zoom, ad.h * zoom),
+        new THREE.MeshPhongMaterial({ color: colors.gray, flatShading: true }));
+    attache.castShadow = true;
+    attache.receiveShadow = true;
+    attache.position.x = ad.x * zoom;
+    attache.position.z = ad.y * zoom;
+    attache.position.y = (0 + ad.z) * zoom;
+    main.add(attache);
+
     let wheels = [
         {
             w: 3,
@@ -739,8 +738,8 @@ function Cell(data) {
     cell = new THREE.Mesh(
         new THREE.BoxBufferGeometry(positionWidth * zoom, positionWidth * zoom, height * zoom),
         new THREE.MeshPhongMaterial({ color: color }));
-    cell.castShadow = false;
-    cell.receiveShadow = false;
+    cell.castShadow = true;
+    cell.receiveShadow = true;
     cell.position.x = 0;
 
     let default_z = 15;

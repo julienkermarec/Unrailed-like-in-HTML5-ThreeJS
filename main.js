@@ -2,10 +2,10 @@ const initaliseValues = () => {
 
     lanes = generateLanes();
     train = generateTrain();
-    train_smoke_default = new Smoke();
     train_smoke = new Smoke();
+    train_smoke_default = new Smoke();
     train.add(train_smoke);
-    // console.log(train_smoke);
+    console.log(train_smoke);
     scene.add(train);
 
     menu.style.display = 'none';
@@ -33,11 +33,9 @@ const initaliseValues = () => {
     camera.position.x = initialCameraPositionX;
 
 
-    // dirLight.position.z = 180;
+    dirLight.position.x = initialDirLightPositionX;
+    dirLight.position.y = initialDirLightPositionY;
     // dirLight.target = train;
-    // dirLight.position.x = initialDirLightPositionX;
-    // dirLight.position.y = initialDirLightPositionY;
-    // dirLight.position.y = initialDirLightPositionY;
 };
 
 const renderer = new THREE.WebGLRenderer({
@@ -304,7 +302,7 @@ function move(pdirection, userId = null) {
     console.log("direction", direction);
 
     can_walk_ground = ['e', 'w']
-    can_walk_addon = ['t', 'r', 'm', 's', 'd'];
+    can_walk_addon = ['t', 'r', 'm'];
 
     if (direction === 'forward') {
         if (finalPositions.lane < 0) {
@@ -375,38 +373,26 @@ function animate(timestamp) {
     const delta = timestamp - previousTimestamp;
     previousTimestamp = timestamp;
 
-    // dirLight.position.x = initialDirLightPositionX;
-    // dirLight.position.x = initialDirLightPositionX;
+    dirLight.position.x = initialDirLightPositionX;
     // console.log("camera.position.y", camera.position.y);
     if (started) {
         // console.log("move train", train);
-        //Position du train
         train.position.y += 1 / 100 * delta;
-        // dirLight.position.x = train.position.x + initialDirLightPositionX;
-        // dirLight.position.y = train.position.y + initialDirLightPositionY;
-        // dirLight.position.z = 400;
-        // dirLight.rotation.y = Math.PI / 2;
-        // dirLight.rotation.x = Math.PI / 4;
-
-        // Fumée du train
-        if (train_smoke != null) {
-
-            train_smoke.position.z += 1 / 500 * delta;
-            train_smoke.position.y -= 1 / 100 * delta;
-            train_smoke.scale.x += 1 / 4000 * delta;
-            train_smoke.scale.y += 1 / 4000 * delta;
-            train_smoke.scale.z += 1 / 4000 * delta;
-            train_smoke.children[0].material.opacity -= 1 / 3000 * delta;
-            // console.log("train_smoke.children[0].material.opacity", train_smoke.children[0].material.opacity);
-            if (train_smoke.children[0].material.opacity < 0) {
-                // console.log("train_smoke_default", train_smoke_default);
-                train_smoke.children[0].material.opacity = 0.99;
-                train_smoke.position.z = train_smoke_default.position.z;
-                train_smoke.position.y = train_smoke_default.position.y;
-                train_smoke.scale.x = train_smoke_default.scale.x;
-                train_smoke.scale.y = train_smoke_default.scale.y;
-                train_smoke.scale.z = train_smoke_default.scale.z;
-            }
+        train_smoke.position.z += 1 / 500 * delta;
+        train_smoke.position.y -= 1 / 100 * delta;
+        train_smoke.scale.x += 1 / 4000 * delta;
+        train_smoke.scale.y += 1 / 4000 * delta;
+        train_smoke.scale.z += 1 / 4000 * delta;
+        train_smoke.children[0].material.opacity -= 1 / 3000 * delta;
+        // console.log("train_smoke.children[0].material.opacity", train_smoke.children[0].material.opacity);
+        if (train_smoke.children[0].material.opacity < 0) {
+            // console.log("train_smoke_default", train_smoke_default);
+            train_smoke.children[0].material.opacity = 0.99;
+            train_smoke.position.z = train_smoke_default.position.z;
+            train_smoke.position.y = train_smoke_default.position.y;
+            train_smoke.scale.x = train_smoke_default.scale.x;
+            train_smoke.scale.y = train_smoke_default.scale.y;
+            train_smoke.scale.z = train_smoke_default.scale.z;
         }
 
         camera.position.y += 1 / 100 * delta;
@@ -601,9 +587,9 @@ function init() {
     dirLight.shadow.camera.top = -d;
     dirLight.shadow.camera.bottom = d;
 
-    var helper = new THREE.CameraHelper(dirLight.shadow.camera);
-    // var helper = new THREE.CameraHelper(camera);
-    scene.add(helper)
+    // var helper = new THREE.CameraHelper( dirLight.shadow.camera );
+    // var helper = new THREE.CameraHelper( camera );
+    // scene.add(helper)
 
     backLight = new THREE.DirectionalLight(0x000000, .4);
     backLight.position.set(200, 200, 50);
