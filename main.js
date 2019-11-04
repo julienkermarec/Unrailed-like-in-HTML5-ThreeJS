@@ -10,6 +10,9 @@ const initaliseValues = () => {
 
     menu.style.display = 'none';
     start();
+    train_position = [9, 7];
+    train_length = 6;
+    train_counter = 30;
     currentLane = 7;
     currentColumn = 12;
     currentLane = 3;
@@ -126,12 +129,30 @@ function pick() {
         return;
     type = levels[level_id][currentColumn][currentLane][1];
     type_color = (type == 'b' ? 0xaa5252 : colors.metal);
-    if (type == 'b' || type == 'p') {
+    cell = getCell();
+    drop = levels[level_id][cell.column][cell.lane];
+    update_player = false;
+    console.log("drop", drop);
+    // Si drop == stock
+    if (player_pick.length > 0 && drop[2] == 's') {
+        player_pick = [];
+        train.children[1].children[5].visible = true;
+    }
+    // Si drop == rails
+    else if (player_pick.length == 0 && drop[2] == 'r') {
+        player_pick = ['p'];
+        update_player = true;
+    }
+    else if (type == 'b' || type == 'p') {
         if (player_pick.length >= 3 || player_pick.length > 0 && player_pick[0] != type)
             return;
         levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane][0];
         lanes[currentLane].mesh.children[currentColumn].children[1].position.z = -45;
         player_pick.push(type);
+        update_player = true;
+    }
+
+    if (update_player == true) {
         console.log("player pick", player)
         // player.children[3].rotation.z = Math.PI / 2;
         // BRAS PICK
@@ -141,6 +162,7 @@ function pick() {
         player.children[2].children[0].rotation.x = Math.PI / 2;
         player.children[2].children[0].rotation.y = Math.PI / 2;
         player.children[2].children[0].position.x = 10;
+
         if (player_pick.length == 1) {
             player.children[2].children[2].visible = true;
             player.children[2].children[3].visible = true;
@@ -162,16 +184,16 @@ function pick() {
     }
 }
 
+function getCell() {
+    if (direction === 'forward') return { lane: currentLane + 1, column: currentColumn };
+    if (direction === 'backward') return { lane: currentLane - 1, column: currentColumn };
+    if (direction === 'left') return { lane: currentLane, column: currentColumn - 1 };
+    if (direction === 'right') return { lane: currentLane, column: currentColumn + 1 };
+}
+
 function action() {
     if (!started)
         return;
-
-    function getCell() {
-        if (direction === 'forward') return { lane: currentLane + 1, column: currentColumn };
-        if (direction === 'backward') return { lane: currentLane - 1, column: currentColumn };
-        if (direction === 'left') return { lane: currentLane, column: currentColumn - 1 };
-        if (direction === 'right') return { lane: currentLane, column: currentColumn + 1 };
-    }
     nextCell = getCell();
     if (nextCell.column < 0 || nextCell.column >= columns || nextCell.lane < 0)
         return;
@@ -307,6 +329,7 @@ function move(pdirection, userId = null) {
 
     can_walk_ground = ['e', 'w']
     can_walk_addon = ['t', 'r', 'm', 's', 'd'];
+    can_walk_train = ['r', 's', 't']; // rails / stock / train
 
     if (direction === 'forward') {
         if (finalPositions.lane < 0) {
@@ -317,6 +340,8 @@ function move(pdirection, userId = null) {
             if (can_walk_ground.indexOf(levels[level_id][finalPositions.column][finalPositions.lane + 1][0]) !== -1)
                 return setDirections('forward');
             if (can_walk_addon.indexOf(levels[level_id][finalPositions.column][finalPositions.lane + 1][1]) !== -1)
+                return setDirections('forward');
+            if (can_walk_train.indexOf(levels[level_id][finalPositions.column][finalPositions.lane + 1][2]) !== -1)
                 return setDirections('forward');
             if (!stepStartTimestamp)
                 startMoving = true;
@@ -332,6 +357,8 @@ function move(pdirection, userId = null) {
                 return setDirections('backward');
             if (can_walk_addon.indexOf(levels[level_id][finalPositions.column][finalPositions.lane - 1][1]) !== -1)
                 return setDirections('backward');
+            if (can_walk_train.indexOf(levels[level_id][finalPositions.column][finalPositions.lane - 1][2]) !== -1)
+                return setDirections('backward');
             if (!stepStartTimestamp)
                 startMoving = true;
         }
@@ -346,6 +373,8 @@ function move(pdirection, userId = null) {
                 return setDirections('left');
             if (can_walk_addon.indexOf(levels[level_id][finalPositions.column - 1][finalPositions.lane][1]) !== -1)
                 return setDirections('left');
+            if (can_walk_train.indexOf(levels[level_id][finalPositions.column - 1][finalPositions.lane][2]) !== -1)
+                return setDirections('left');
             if (!stepStartTimestamp) startMoving = true;
         }
     } else if (direction === 'right') {
@@ -358,6 +387,8 @@ function move(pdirection, userId = null) {
             if (can_walk_ground.indexOf(levels[level_id][finalPositions.column + 1][finalPositions.lane][0]) !== -1)
                 return setDirections('right');
             if (can_walk_addon.indexOf(levels[level_id][finalPositions.column + 1][finalPositions.lane][1]) !== -1)
+                return setDirections('right');
+            if (can_walk_train.indexOf(levels[level_id][finalPositions.column + 1][finalPositions.lane][2]) !== -1)
                 return setDirections('right');
             if (!stepStartTimestamp) startMoving = true;
         }
@@ -380,8 +411,33 @@ function animate(timestamp) {
     dirLight.position.x = initialDirLightPositionX;
     // console.log("camera.position.y", camera.position.y);
     if (started) {
-        // console.log("move train", train);
-        train.position.y += 1 / 100 * delta;
+        // console.log("train_counter", train_counter);
+        if (train_counter >= positionWidth * zoom) {
+            for (let i = train_position[1] - train_length; i <= train_position[1]; i++) {
+                j = train_position[1] - i;
+                console.log("j", j);
+                console.log("i", i);
+                if (j <= 1)
+                    levels[level_id][train_position[0]][i] = 'glt';
+                else if (j <= 3)
+                    levels[level_id][train_position[0]][i] = 'gls';
+                else if (j <= 5)
+                    levels[level_id][train_position[0]][i] = 'glr';
+                else if (j == 6)
+                    levels[level_id][train_position[0]][i] = 'gl'
+
+            }
+            y = train_position[1];
+            y++;
+            train_position = [train_position[0], y];
+            train_counter = 0;
+            console.log(" levels[level_id][train_position[" + train_position[0] + "]]", levels[level_id][train_position[0]]);
+            console.log("train_position", train_position);
+        }
+        else {
+            train_counter += 1 / 100 * delta;
+            train.position.y += 1 / 100 * delta;
+        }
         train_smoke.position.z += 1 / 500 * delta;
         train_smoke.position.y -= 1 / 100 * delta;
         train_smoke.scale.x += 1 / 4000 * delta;
@@ -565,7 +621,7 @@ function init() {
     document.body.appendChild(stats.domElement);
 
     // initialCameraPositionX += (currentColumn * positionWidth) * zoom;
-    initialCameraPositionY += 600;
+    initialCameraPositionY += 400;
     initialCameraPositionX += 300;
     camera.position.y = initialCameraPositionX;
     camera.position.x = initialCameraPositionY;

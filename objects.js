@@ -233,11 +233,34 @@ function WaterGround() {
 
     return waterground;
 }
-function Wagon(size = 2, color = 'black') {
+function Wagon(type) {
+    p = positionWidth * 1.5;
+    if (type == 'train') {
+        size = 15;
+        color = 'red';
+        bords_height = 4;
+        bords_color = colors.rail;
+    }
+    else if (type == 'stock') {
+        size = 2;
+        color = 'black';
+        bords_height = 12;
+        bords_color = '#8D6842';
+    }
+    else {
+        size = 2;
+        color = 'black';
+        bords_height = 4;
+        bords_color = colors.rail;
+
+        if (type == 'rail') {
+            p = positionWidth * 1;
+        }
+    }
     const wagon = new THREE.Group();
 
     const main = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(positionWidth * zoom, positionWidth * 1.5 * zoom, size * zoom),
+        new THREE.BoxBufferGeometry((positionWidth - 2) * zoom, p * zoom, size * zoom),
         new THREE.MeshPhongMaterial({ color: colors[color], flatShading: false }));
     main.position.z = (7 + size / 2) * zoom;
     main.castShadow = true;
@@ -245,32 +268,32 @@ function Wagon(size = 2, color = 'black') {
 
     let bords = [
         {
-            w: 22,
-            h: 4,
+            w: 20,
+            h: bords_height,
             d: 2,
             x: 0,
             y: 1,
-            z: 15,
+            z: p / 2,
         }, {
-            w: 22,
-            h: 4,
+            w: 20,
+            h: bords_height,
             d: 2,
             x: 0,
             y: 1,
-            z: -15,
+            z: -(p / 2),
         },
         {
             w: 2,
-            h: 4,
-            d: 30,
-            x: 10,
+            h: bords_height,
+            d: p,
+            x: 9,
             y: 1,
             z: 0,
         }, {
             w: 2,
-            h: 4,
-            d: 30,
-            x: -10,
+            h: bords_height,
+            d: p,
+            x: -9,
             y: 1,
             z: 0,
         }
@@ -278,11 +301,11 @@ function Wagon(size = 2, color = 'black') {
     for (let bord of bords) {
         const ba = new THREE.Mesh(
             new THREE.BoxBufferGeometry(bord.w * zoom, bord.d * zoom, bord.h * zoom),
-            new THREE.MeshPhongMaterial({ color: colors.rail, flatShading: true }));
+            new THREE.MeshPhongMaterial({ color: bords_color, flatShading: true }));
         ba.castShadow = true;
         ba.receiveShadow = true;
         ba.position.x = bord.x * zoom;
-        ba.position.z = (-(size / 2) + 2) * zoom;
+        ba.position.z = (-(size / 2) + (bords_height / 2)) * zoom;
         ba.position.y = bord.z * zoom;
         main.add(ba);
     }
@@ -292,7 +315,7 @@ function Wagon(size = 2, color = 'black') {
         d: 10,
         x: 0,
         y: 1,
-        z: 20,
+        z: p / 2 + 5,
     };
     if (color != 'red') {
         const attache = new THREE.Mesh(
@@ -358,9 +381,9 @@ function Train() {
 
     const wagon = new THREE.Group();
 
-    const main = new Wagon(15, 'red');
+    const main = new Wagon('train');
     const cabin = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(positionWidth * zoom, (positionWidth - 4) * zoom, positionWidth / 2 * zoom),
+        new THREE.BoxBufferGeometry((positionWidth - 2) * zoom, (positionWidth - 4) * zoom, positionWidth / 2 * zoom),
         [
             new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carBackTexture }),
             new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carFrontTexture }),
@@ -914,95 +937,4 @@ function Lane(index) {
         }
     }
     this.cells = cells;
-    return;
-    switch (this.type) {
-        case 'field': {
-            this.type = 'field';
-            this.mesh = new Grass(index);
-            const rails = new Rails();
-
-            position = 7;
-            rails.position.x = (position * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2;
-            this.mesh.add(rails);
-
-            break;
-        }
-        case 'rock': {
-            this.mesh = new Grass(index);
-
-            this.occupiedPositions = [];
-            this.rocks = [1, 2].map(() => {
-                const rock = new Rock();
-                let position;
-                do {
-                    position = Math.floor(Math.random() * (columns - 6));
-                } while (this.occupiedPositions.indexOf(position) !== -1);
-                this.occupiedPositions.push(position);
-                rock.position.x = (position * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2;
-                this.mesh.add(rock);
-                return rock;
-            });
-            break;
-        }
-        case 'forest': {
-            this.mesh = new Grass(index);
-
-            this.occupiedPositions = [];
-            this.threes = [1, 2].map(() => {
-                const three = new Arbre();
-                let position;
-                do {
-                    position = Math.floor(Math.random() * (columns - 6));
-                } while (this.occupiedPositions.indexOf(position) !== -1);
-                this.occupiedPositions.push(position);
-                three.position.x = (position * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2;
-                this.mesh.add(three);
-                return three;
-            });
-            break;
-        }
-        case 'car': {
-            this.mesh = new Road();
-            this.direction = Math.random() >= 0.5;
-
-            const occupiedPositions = new Set();
-            this.vechicles = [1, 2, 3].map(() => {
-                const vechicle = new Train();
-                let position;
-                do {
-                    position = Math.floor(Math.random() * columns / 2);
-                } while (occupiedPositions.has(position));
-                occupiedPositions.add(position);
-                vechicle.position.x = (position * positionWidth * 2 + positionWidth / 2) * zoom - boardWidth * zoom / 2;
-                if (!this.direction) vechicle.rotation.z = Math.PI;
-                this.mesh.add(vechicle);
-                return vechicle;
-            });
-
-            this.speed = laneSpeeds[Math.floor(Math.random() * laneSpeeds.length)];
-            break;
-        }
-        case 'truck': {
-            this.mesh = new Road();
-            this.direction = Math.random() >= 0.5;
-
-            const occupiedPositions = new Set();
-            this.vechicles = [1, 2].map(() => {
-                const vechicle = new Truck();
-                let position;
-                do {
-                    position = Math.floor(Math.random() * columns / 3);
-                } while (occupiedPositions.has(position));
-                occupiedPositions.add(position);
-                vechicle.position.x = (position * positionWidth * 3 + positionWidth / 2) * zoom - boardWidth * zoom / 2;
-                if (!this.direction) vechicle.rotation.z = Math.PI;
-                this.mesh.add(vechicle);
-                return vechicle;
-            });
-
-            this.speed = laneSpeeds[Math.floor(Math.random() * laneSpeeds.length)];
-            break;
-        }
-    }
-
 }

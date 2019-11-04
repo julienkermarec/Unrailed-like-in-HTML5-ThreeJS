@@ -37,6 +37,9 @@ let hache;
 let pioche;
 let lanes;
 let train;
+let train_position;
+let train_length;
+let train_counter;
 let train_smoke;
 let train_smoke_default;
 let level_id = 0;
@@ -107,14 +110,14 @@ const generateLanes = () => [...Array(40).keys()].map(index => {
 const generateTrain = () => {
     let train = new Train();
     train.position.x = (9 * positionWidth) * zoom;
-    train.position.y = 8 * positionWidth * zoom;
+    train.position.y = 5.5 * positionWidth * zoom;
 
-    let wagon = new Wagon();
+    let wagon = new Wagon('stock');
     wagon.position.y = -2 * positionWidth * zoom;
     train.add(wagon);
 
-    wagon2 = new Wagon();
-    wagon2.position.y = -4 * positionWidth * zoom;
+    wagon2 = new Wagon('rail');
+    wagon2.position.y = -3.7 * positionWidth * zoom;
     train.add(wagon2);
     // train.scale(0.1, 0.1, 0.1);
 
