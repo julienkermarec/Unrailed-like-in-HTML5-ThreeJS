@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Unrailed with three.js</title>
-    <link rel="stylesheet" type="text/css" href="styles.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="css/styles.css" media="all" />
     <script>
         window.console = window.console || function (t) { };
     </script>
@@ -19,7 +19,7 @@
     <div id="stats_rocks">0</div>
     <div id="stats_woods">0</div>
     <div id="counter">0</div>
-    <div id="controlls">
+    <div id="controlls" style="display : none;">
         <div>
             <button id="forward">
                 <svg width="30" height="30" viewBox="0 0 10 10">
@@ -51,7 +51,7 @@
             </button>
         </div>
     </div>
-    <div id="chat">
+    <div id="chat" style="display : none">
         <div id="chat-output"></div>
         <textarea id="chat-input"></textarea>
 
@@ -72,12 +72,12 @@
     </div>
     <script src="https://cdn.webrtc-experiment.com/DataChannel.js"> </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/99/three.min.js"></script>
-    <script src="node_modules/stats.js/build/stats.min.js"></script>
-    <script src="levels.js"></script>
-    <script src="variables.js"></script>
-    <script src="objects.js"></script>
-    <script src="main.js"></script>
-    <script src="multiplayer.js"></script>
+    <script src="libs/stats.min.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/variables.js"></script>
+    <script src="js/objects.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/multiplayer.js"></script>
 </body>
 
 </html>

@@ -1,23 +1,24 @@
 const initaliseValues = () => {
 
-    lanes = generateLanes();
-    train = generateTrain();
-    train_smoke = new Smoke();
-    train_smoke_default = new Smoke();
-    train.add(train_smoke);
-    console.log(train_smoke);
-    scene.add(train);
 
-    menu.style.display = 'none';
-    start();
-    train_position = [9, 7];
-    train_length = 6;
-    train_counter = 30;
+    water_bucket_position = [11, 2];
+    hache_position = [11, 3];
+    axe_position = [11, 4];
+    train_position = [9, 9];
+    train_length = 7;
+    train_counter = 0;
+    train_countdown = 1000;
     currentLane = 7;
     currentColumn = 12;
     currentLane = 3;
     currentColumn = 8;
     level_id = 0;
+    stock = {
+        rails: 0,
+        pierre: 0,
+        bois: 0,
+    }
+    level_distance = levels[level_id][0].length;
     player_pick = [];
 
     previousTimestamp = null;
@@ -39,6 +40,26 @@ const initaliseValues = () => {
     dirLight.position.x = initialDirLightPositionX;
     dirLight.position.y = initialDirLightPositionY;
     // dirLight.target = train;
+
+    lanes = generateLanes();
+    train = generateTrain();
+    wwater = generateWagonWater();
+    wstock = generateWagonStock();
+    wrails = generateWagonRails();
+    train_smoke = new Smoke();
+    wwater_smoke = new Smoke();
+    train_smoke_default = new Smoke();
+    train.add(train_smoke);
+    scene.add(train);
+    wwater_smoke.position.y = - 20;
+    wwater_smoke.visible = false;
+    wwater.add(wwater_smoke);
+    scene.add(wwater);
+    scene.add(wstock);
+    scene.add(wrails);
+
+    menu.style.display = 'none';
+    start();
 };
 
 const renderer = new THREE.WebGLRenderer({
@@ -55,6 +76,9 @@ function createStats() {
     stats.domElement.style.top = '0';
 
     return stats;
+}
+String.prototype.replaceAt = function (index, replacement) {
+    return this.substr(0, index) + replacement + this.substr(index + replacement.length);
 }
 
 renderer.shadowMap.enabled = true;
@@ -94,11 +118,8 @@ document.getElementById('left').addEventListener("click", () => move('backward')
 document.getElementById('right').addEventListener("click", () => move('forward'));
 
 window.addEventListener("keydown", event => {
-    console.log("event.keyCode", event.keyCode);
+    // console.log("event.keyCode", event.keyCode);
 
-    // else if (event.keyCode == '16') {
-    //     pick();
-    // }s
     if (event.keyCode == '32') {
         pick();
     }
@@ -124,64 +145,272 @@ window.addEventListener("keydown", event => {
 function pick() {
     console.log("pick", levels[level_id][currentColumn][currentLane]);
 
-    console.log("player pick", player_pick)
     if (!started)
         return;
-    type = levels[level_id][currentColumn][currentLane][1];
-    type_color = (type == 'b' ? 0xaa5252 : colors.metal);
+    pick_item = levels[level_id][currentColumn][currentLane][1];
+    pick_item_nb = parseInt(levels[level_id][currentColumn][currentLane][2]);
+    if (!(pick_item_nb >= 0))
+        pick_item_nb = ' ';
+    type_color = (pick_item == 'b' ? colors.bois : colors.metal);
     cell = getCell();
-    drop = levels[level_id][cell.column][cell.lane];
+    drop_cell = levels[level_id][cell.column] && levels[level_id][cell.column] ? levels[level_id][cell.column][cell.lane] : null;
     update_player = false;
-    console.log("drop", drop);
-    // Si drop == stock
-    if (player_pick.length > 0 && drop[2] == 's') {
-        player_pick = [];
-        train.children[1].children[5].visible = true;
-    }
-    // Si drop == rails
-    else if (player_pick.length == 0 && drop[2] == 'r') {
-        player_pick = ['p'];
+    console.log("cell", cell)
+    console.log("player pick", player_pick)
+    console.log("direction", direction)
+    console.log("pick column", levels[level_id][currentColumn]);
+    console.log("pick cell", levels[level_id][currentColumn][currentLane]);
+    console.log("pick item", pick_item);
+    console.log("pick_item_nb", pick_item_nb);
+    console.log("drop_cell", drop_cell);
+
+    need_to_drop = [];
+    picked = false;
+
+    // Si pick == axe ou pickaxe ou waterbucket
+    if (pick_item == 'h' || pick_item == 'a' || pick_item == 'w') {
+        console.log("pick == axe ou pickaxe ou waterbucket");
+        need_to_drop = player_pick;
+        lanes[currentLane].mesh.children[currentColumn].children.pop();
+        levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, ' ');
+        player_pick = [pick_item];
         update_player = true;
     }
-    else if (type == 'b' || type == 'p') {
-        if (player_pick.length >= 3 || player_pick.length > 0 && player_pick[0] != type)
-            return;
-        levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane][0];
-        lanes[currentLane].mesh.children[currentColumn].children[1].position.z = -45;
-        player_pick.push(type);
+    // Si pick == bois ou pierre
+    else if (pick_item == 'b' || pick_item == 'p') {
+        console.log("pick == bois ou pierre");
+        // Disable pick if max length but enable pick & drop
+        if (player_pick.length >= 3) {
+            console.warn("cant pick more");
+            picked = false;
+            need_to_drop = player_pick;
+        }
+        else {
+            console.warn("picked true");
+            picked = true;
+            need_to_drop = player_pick;
+            if (pick_item_nb <= 3) {
+                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, " ");
+                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(2, " ");
+            } else
+                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(2, (pick_item_nb - 3).toString());
+
+            // player_pick = [pick_item];
+            // lanes[currentLane].mesh.children[currentColumn].children.pop();
+            for (let i = 0; i <= pick_item_nb && i < 3; i++) {
+                player_pick.push(pick_item);
+                lanes[currentLane].mesh.children[currentColumn].children.pop();
+            }
+        }
         update_player = true;
     }
 
+    console.log("need_to_drop", need_to_drop);
+    console.log("before drop", levels[level_id][currentColumn][currentLane]);
+
+    console.log("drop_cell", drop_cell);
+    console.log("player_pick", player_pick);
+    // Si drop == waterGround
+    if (drop_cell != null && drop_cell[0] == 'w' && player_pick.length > 0 && player_pick[0] == "b") {
+        console.log("drop == waterGround");
+        levels[level_id][cell.column][cell.lane] = levels[level_id][cell.column][cell.lane].replaceAt(0, 'x');
+        let wg = new WaterGround();
+        lanes[cell.lane].mesh.children[cell.column].add(wg);
+        player_pick.shift();
+        update_player = true;
+    }
+    // Si drop == wagon stock
+    else if (drop_cell != null && drop_cell[2] == 's' && player_pick.length > 0) {
+        console.log("drop == wagon stock");
+        if (player_pick[0] == 'b') {
+            index = 1;
+            start_at = counter.b;
+            can_drop = 6 - start_at;
+        }
+        if (player_pick[0] == 'p') {
+            index = 2;
+            start_at = counter.p;
+            can_drop = 6 - start_at;
+        }
+        if (can_drop > 3)
+            can_drop = player_pick.length;
+        if (can_drop <= 0)
+            can_drop = 6 - start_at;
+        if (can_drop > 0) {
+            type_color = player_pick[0] == 'b' ? colors.bois : colors.metal;
+            if (can_drop > player_pick.length)
+                can_drop = player_pick.length;
+            for (let i = start_at; i < can_drop + start_at; i++) {
+                wstock.children[index].children[i].visible = true;
+                counter[player_pick[0]]++;
+                player_pick.shift();
+            }
+            update_player = true;
+            updateCounter();
+        }
+        update_player = true;
+        console.log("counter after", JSON.parse(JSON.stringify(counter)));
+        // train.children[1].children[5].visible = true;
+    }
+    // Si drop == wagon rails
+    else if (drop_cell != null && drop_cell[2] == 'r' && player_pick.length == 0 && stock.rails > 0) {
+        console.log("drop == wagon rails");
+        player_pick = ['r', 'r', 'r'];
+        update_player = true;
+    }
+    // Si drop == water bucket
+    else if (drop_cell != null && ((pick_item == " " && player_pick.length > 0 && player_pick[0] == 'w') || need_to_drop[0] == "w")) {
+        console.log("drop == water bucket");
+        lanes[currentLane].mesh.children[currentColumn].add(new WaterBucket());
+        levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, 'w');
+        update_player = true;
+        if (need_to_drop[0] != "w")
+            player_pick = [];
+    }
+    // Si drop == hache
+    else if (drop_cell != null && ((pick_item == " " && player_pick.length > 0 && player_pick[0] == 'h') || need_to_drop[0] == "h")) {
+        console.log("drop == hache");
+        lanes[currentLane].mesh.children[currentColumn].add(new Hache());
+        levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, 'h');
+        update_player = true;
+        if (need_to_drop[0] != "h")
+            player_pick = [];
+    }
+    // Si drop == axe
+    else if (drop_cell != null && ((pick_item == " " && player_pick.length > 0 && player_pick[0] == 'a') || need_to_drop[0] == "a")) {
+        console.log("drop == axe");
+        lanes[currentLane].mesh.children[currentColumn].add(new Axe());
+        levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, 'a');
+        update_player = true;
+        if (need_to_drop[0] != "a")
+            player_pick = [];
+    }
+    // Si drop == bois ou pierre sur g / o / b
+    else if (!picked && drop_cell != null && drop_cell[1] == " " && player_pick.length > 0 && (player_pick[0] == "b" || player_pick[0] == "p")) {
+        console.log("drop == bois sur g / o / b", player_pick);
+        //verification type different
+        if (player_pick.length > 0 && player_pick[0] != levels[level_id][currentColumn][currentLane][1] && levels[level_id][currentColumn][currentLane][1] != " ") {
+            console.warn('cant drop on diffrent type');
+            type_color = (player_pick[0] == 'b' ? colors.bois : colors.metal);
+        }
+        else {
+            levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, player_pick[0]);
+            start_at = pick_item_nb > 0 ? pick_item_nb : 0;
+            if (player_pick.length > 1)
+                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(2, (start_at + player_pick.length).toString());
+
+            for (let i = start_at; i < (player_pick.length + start_at); i++) {
+                if (player_pick[0] == 'b')
+                    sb = new Stock('bois');
+                else
+                    sb = new Stock('metal');
+                // console.log("add", player_pick[0]);
+                sb.position.y = -25;
+                sb.position.z = (i * 3) - 2;
+
+                if (i % 2 !== 0) {
+                    sb.rotation.z = Math.PI;
+                    sb.position.x = positionWidth;
+                    sb.position.y = -4;
+                }
+                lanes[currentLane].mesh.children[currentColumn].add(sb);
+            }
+            update_player = true;
+            if (need_to_drop[0] != "b" || need_to_drop[0] != "p")
+                player_pick = [];
+        }
+    }
+
+    // console.log("after drop", levels[level_id][currentColumn][currentLane]);
     if (update_player == true) {
-        console.log("player pick", player)
+        console.log("update_player", update_player)
+        console.log("player_pick", player_pick)
+        console.log("type_color", type_color)
         // player.children[3].rotation.z = Math.PI / 2;
-        // BRAS PICK
-        player.children[2].children[1].rotation.x = Math.PI / 2;
-        player.children[2].children[1].rotation.y = Math.PI / 2;
-        player.children[2].children[1].position.x = 10;
-        player.children[2].children[0].rotation.x = Math.PI / 2;
-        player.children[2].children[0].rotation.y = Math.PI / 2;
-        player.children[2].children[0].position.x = 10;
 
-        if (player_pick.length == 1) {
-            player.children[2].children[2].visible = true;
-            player.children[2].children[3].visible = true;
-            player.children[2].children[2].material.color.setHex(type_color);
-            player.children[2].children[3].material.color.setHex(type_color);
+        if (player_pick.length > 0) {
+            if (player_pick[0] == 'b' || player_pick[0] == 'p') {
+                if (player_pick.length >= 1) {
+                    player.children[2].children[2].visible = true;
+                    player.children[2].children[3].visible = true;
+                    player.children[2].children[2].material.color.setHex(type_color);
+                    player.children[2].children[3].material.color.setHex(type_color);
+                    player.children[2].children[4].visible = false;
+                    player.children[2].children[5].visible = false;
+                }
+                if (player_pick.length >= 2) {
+                    player.children[2].children[4].visible = true;
+                    player.children[2].children[5].visible = true;
+                    player.children[2].children[4].material.color.setHex(type_color);
+                    player.children[2].children[5].material.color.setHex(type_color);
+                    player.children[2].children[6].visible = false;
+                    player.children[2].children[7].visible = false;
+                }
+                if (player_pick.length >= 3) {
+                    player.children[2].children[6].visible = true;
+                    player.children[2].children[7].visible = true;
+                    player.children[2].children[6].material.color.setHex(type_color);
+                    player.children[2].children[7].material.color.setHex(type_color);
+                }
+            }
+            else if (player_pick[0] == 'r') {
+                player.children[2].children[8].visible = true;
+                player.children[2].children[9].visible = true;
+                player.children[2].children[10].visible = true;
+            }
+            else if (player_pick[0] == 'w') {
+                player.children[2].children[11].visible = true;
+                player.children[2].children[12].visible = false;
+                player.children[2].children[13].visible = false;
+            }
+            else if (player_pick[0] == 'h') {
+                player.children[2].children[11].visible = false;
+                player.children[2].children[12].visible = true;
+                player.children[2].children[13].visible = false;
+            }
+            else if (player_pick[0] == 'a') {
+                player.children[2].children[11].visible = false;
+                player.children[2].children[13].visible = true;
+                player.children[2].children[12].visible = false;
+            }
+
+            // BRAS TENDU
+            player.children[2].children[1].rotation.x = Math.PI / 2;
+            player.children[2].children[1].rotation.y = Math.PI / 2;
+            player.children[2].children[1].position.x = 10;
+            player.children[2].children[0].rotation.x = Math.PI / 2;
+            player.children[2].children[0].rotation.y = Math.PI / 2;
+            player.children[2].children[0].position.x = 10;
+
         }
-        if (player_pick.length == 2) {
-            player.children[2].children[4].visible = true;
-            player.children[2].children[5].visible = true;
-            player.children[2].children[4].material.color.setHex(type_color);
-            player.children[2].children[5].material.color.setHex(type_color);
+        else if (player_pick.length == 0) {
+            // BRAS BAISSE
+            player.children[2].children[1].rotation.x = 0;
+            player.children[2].children[1].rotation.y = 0;
+            player.children[2].children[1].position.x = 0;
+            player.children[2].children[0].rotation.x = 0;
+            player.children[2].children[0].rotation.y = 0;
+            player.children[2].children[0].position.x = 0;
+            for (let i = 2; i <= 6; i = i + 2) {
+                player.children[2].children[i].visible = false;
+                player.children[2].children[i + 1].visible = false;
+            }
+
+            // Rails
+            player.children[2].children[8].visible = false;
+            player.children[2].children[9].visible = false;
+            player.children[2].children[10].visible = false;
+            // Water bucket
+            player.children[2].children[11].visible = false;
+            // Hache
+            player.children[2].children[12].visible = false;
+            // Axe
+            player.children[2].children[13].visible = false;
         }
-        if (player_pick.length == 3) {
-            player.children[2].children[6].visible = true;
-            player.children[2].children[7].visible = true;
-            player.children[2].children[6].material.color.setHex(type_color);
-            player.children[2].children[7].material.color.setHex(type_color);
-        }
+
     }
+
+    console.log("pick column after", levels[level_id][currentColumn]);
 }
 
 function getCell() {
@@ -200,9 +429,9 @@ function action() {
     console.log("action nextCell", nextCell);
     console.log("action direction", direction);
     console.log("action", levels[level_id][nextCell.column][nextCell.lane]);
-    if (levels[level_id][nextCell.column][nextCell.lane][1] == 't')
+    if (levels[level_id][nextCell.column][nextCell.lane][1] == 't' && player_pick[0] == 'h')
         return cutForest(nextCell.column, nextCell.lane);
-    if (levels[level_id][nextCell.column][nextCell.lane][1] == 'r')
+    if (levels[level_id][nextCell.column][nextCell.lane][1] == 'r' && player_pick[0] == 'a')
         return cutRock(nextCell.column, nextCell.lane);
     // if (counter.rocks < 10 || counter.woods < 10)
     //     return;
@@ -228,9 +457,9 @@ function action() {
 }
 
 function updateCounter() {
-    statsRocksDOM.innerHTML = counter.rocks;
-    statsWoodsDOM.innerHTML = counter.woods;
-    counterDOM.innerHTML = counter.rails;
+    statsRocksDOM.innerHTML = counter.p;
+    statsWoodsDOM.innerHTML = counter.b;
+    counterDOM.innerHTML = counter.r;
 }
 function cutForest(column, lane) {
     console.log("cutForest currentColumn", currentColumn, column);
@@ -323,20 +552,20 @@ function move(pdirection, userId = null) {
         if (move === 'left') return { lane: position.lane, column: position.column - 1 };
         if (move === 'right') return { lane: position.lane, column: position.column + 1 };
     }, { lane: currentLane, column: currentColumn });
-    console.log("-------");
-    console.log("direction", direction);
-    console.log("direction", direction);
+    // console.log("-------");
+    // console.log("direction", direction);
+    // console.log("direction", direction);
 
     can_walk_ground = ['e', 'w']
-    can_walk_addon = ['t', 'r', 'm', 's', 'd'];
-    can_walk_train = ['r', 's', 't']; // rails / stock / train
+    can_walk_addon = ['t', 'r', 'm', 's', 'd'];//, 'w', 'a', 'h']; // tree / rock / metal / station / disable / waterbucket / axe / hache
+    can_walk_train = ['r', 's', 't', 'w']; // rails / stock / train / water
 
     if (direction === 'forward') {
-        if (finalPositions.lane < 0) {
-            if (!stepStartTimestamp) { startMoving = true; }
+        if (finalPositions.lane + 1 >= level_distance) {
+            return setDirections('forward');
         }
         else {
-            console.log("next cell", levels[level_id][finalPositions.column][finalPositions.lane + 1]);
+            // console.log("next cell", levels[level_id][finalPositions.column][finalPositions.lane + 1]);
             if (can_walk_ground.indexOf(levels[level_id][finalPositions.column][finalPositions.lane + 1][0]) !== -1)
                 return setDirections('forward');
             if (can_walk_addon.indexOf(levels[level_id][finalPositions.column][finalPositions.lane + 1][1]) !== -1)
@@ -349,7 +578,7 @@ function move(pdirection, userId = null) {
         }
     } else if (direction === 'backward') {
         if (finalPositions.lane <= 0) {
-            if (!stepStartTimestamp) { startMoving = true; }
+            return setDirections('backward');
         }
         else {
             console.log("next cell", levels[level_id][finalPositions.column][finalPositions.lane - 1]);
@@ -394,8 +623,8 @@ function move(pdirection, userId = null) {
         }
     }
 
-    console.log("dirLight.position.x", dirLight.position.x);
-    console.log("dirLight.position.y", dirLight.position.y);
+    // console.log("dirLight.position.x", dirLight.position.x);
+    // console.log("dirLight.position.y", dirLight.position.y);
     if (userId == null) {
         moves.push(direction);
     }
@@ -410,20 +639,22 @@ function animate(timestamp) {
 
     dirLight.position.x = initialDirLightPositionX;
     // console.log("camera.position.y", camera.position.y);
-    if (started) {
+    if (started && train_countdown <= - 1) {
         // console.log("train_counter", train_counter);
         if (train_counter >= positionWidth * zoom) {
             for (let i = train_position[1] - train_length; i <= train_position[1]; i++) {
                 j = train_position[1] - i;
-                console.log("j", j);
-                console.log("i", i);
+                // console.log("j", j);
+                // console.log("i", i);
                 if (j <= 1)
                     levels[level_id][train_position[0]][i] = 'glt';
-                else if (j <= 3)
+                else if (j <= 2)
+                    levels[level_id][train_position[0]][i] = 'glw';
+                else if (j <= 4)
                     levels[level_id][train_position[0]][i] = 'gls';
-                else if (j <= 5)
+                else if (j <= 6)
                     levels[level_id][train_position[0]][i] = 'glr';
-                else if (j == 6)
+                else if (j == 7)
                     levels[level_id][train_position[0]][i] = 'gl'
 
             }
@@ -431,33 +662,93 @@ function animate(timestamp) {
             y++;
             train_position = [train_position[0], y];
             train_counter = 0;
-            console.log(" levels[level_id][train_position[" + train_position[0] + "]]", levels[level_id][train_position[0]]);
-            console.log("train_position", train_position);
+            // console.log(" levels[level_id][train_position[" + train_position[0] + "]]", levels[level_id][train_position[0]]);
+            // console.log("train_position", train_position);
+        }
+
+        train_counter += 1 / 100 * delta;
+        train.position.y += 1 / 100 * delta;
+        wwater.position.y += 1 / 100 * delta;
+        wstock.position.y += 1 / 100 * delta;
+        wrails.position.y += 1 / 100 * delta;
+        if (wwater.children[0].children[0].scale.z > 0) {
+            wwater.children[0].children[0].scale.z -= 0.0002;
         }
         else {
-            train_counter += 1 / 100 * delta;
-            train.position.y += 1 / 100 * delta;
+            train_smoke.children[0].material.color.setHex(colors.red);
+            wwater_smoke.children[0].material.color.setHex(colors.red);
+            wwater_smoke.visible = true;
+            if (wwater.children[0].children[0].visible == true) {
+                wwater.children[0].children[0].visible = false;
+                train_smoke.children[0].material.opacity = 0.99;
+            }
         }
+
+        let timing_smoke = 3000;
+        if (wwater.children[0].children[0].visible == false) {
+            timing_smoke = 9000;
+        }
+
+        // console.log("wwater.children[0].children[0].scale.z", wwater.children[0].children[0].scale.z);
+
         train_smoke.position.z += 1 / 500 * delta;
         train_smoke.position.y -= 1 / 100 * delta;
         train_smoke.scale.x += 1 / 4000 * delta;
         train_smoke.scale.y += 1 / 4000 * delta;
         train_smoke.scale.z += 1 / 4000 * delta;
-        train_smoke.children[0].material.opacity -= 1 / 3000 * delta;
+        train_smoke.children[0].material.opacity -= 1 / timing_smoke * delta;
+        if (wwater.children[0].children[0].visible == false) {
+
+            wwater_smoke.position.z += 1 / 500 * delta;
+            wwater_smoke.position.y -= 1 / 100 * delta;
+            wwater_smoke.scale.x += 1 / 4000 * delta;
+            wwater_smoke.scale.y += 1 / 4000 * delta;
+            wwater_smoke.scale.z += 1 / 4000 * delta;
+            wwater_smoke.children[0].material.opacity -= 1 / timing_smoke * delta;
+        }
         // console.log("train_smoke.children[0].material.opacity", train_smoke.children[0].material.opacity);
         if (train_smoke.children[0].material.opacity < 0) {
             // console.log("train_smoke_default", train_smoke_default);
             train_smoke.children[0].material.opacity = 0.99;
             train_smoke.position.z = train_smoke_default.position.z;
-            train_smoke.position.y = train_smoke_default.position.y;
-            train_smoke.scale.x = train_smoke_default.scale.x;
-            train_smoke.scale.y = train_smoke_default.scale.y;
             train_smoke.scale.z = train_smoke_default.scale.z;
+            train_smoke.scale.y = train_smoke_default.scale.y;
+            train_smoke.scale.x = train_smoke_default.scale.x;
+            train_smoke.position.y = train_smoke_default.position.y;
+
+            if (wwater.children[0].children[0].visible == false) {
+                wwater_smoke.children[0].material.opacity = 0.99;
+                wwater_smoke.position.z = train_smoke_default.position.z;
+                wwater_smoke.scale.z = train_smoke_default.scale.z;
+                wwater_smoke.scale.y = train_smoke_default.scale.y;
+                wwater_smoke.scale.x = train_smoke_default.scale.x;
+                wwater_smoke.position.y = -20;
+            }
         }
+
+
 
         camera.position.y += 1 / 100 * delta;
 
         // scene.translateY(1 / 100 * delta * -1);
+    }
+    else if (train_countdown > -1) {
+        train_countdown -= 1;
+
+        // console.log("train_countdown", train_countdown);
+        if (Number.isInteger(train_countdown / 100)) {
+            if (train_countdown / 100 > 0) {
+                train.children[train_countdown / 100 + 1].visible = true;
+
+                if (train_countdown / 100 < 10) {
+                    train.children[train_countdown / 100 + 2].visible = false;
+                }
+            }
+            else {
+                train.children[train_countdown / 100 + 1].visible = false;
+                train.children[train_countdown / 100 + 2].visible = false;
+            }
+        }
     }
 
     if (startMoving) {

@@ -5,12 +5,12 @@ const statsWoodsDOM = document.getElementById('stats_woods');
 const endDOM = document.getElementById('end');
 
 const scene = new THREE.Scene();
-const distance = 500;
+const distance = 350;
 const camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 0.1, 10000);
 
-camera.rotation.x = 24 * Math.PI / 180;
-camera.rotation.y = 40 * Math.PI / 180;
-camera.rotation.z = 60 * Math.PI / 180;
+camera.rotation.x = 14 * Math.PI / 180;
+camera.rotation.y = 45 * Math.PI / 180;
+camera.rotation.z = 75 * Math.PI / 180;
 
 console.log("camera.rotation", camera.rotation);
 
@@ -31,6 +31,7 @@ const initialDirLightPositionX = 130;
 const initialDirLightPositionY = 100;
 
 var stats;
+var stock;
 let player;
 let player_pick;
 let hache;
@@ -40,23 +41,30 @@ let train;
 let train_position;
 let train_length;
 let train_counter;
+let train_countdown;
 let train_smoke;
 let train_smoke_default;
 let level_id = 0;
+let level_distance = 0;
 let colors = {
     rail: 0x414141,
-    rock: 0xe28b6d,
-    metal: 0xe906c6c,
+    rock: 0xaa825c,
+    pierre: 0xaa825c,
+    bois: 0x774a1c,
+    sapin: 0x45be6f,
+    metal: 0x474648,
     black: 0x000000,
+    water: 0x00ffe0,
     red: 0xff3333,
     wheel: 0x333333,
-    blue: 0x0000ff,
+    blue: 0x078fff,
     gray: 0xcccccc,
+    pink: 0xf274d6,
 };
 let counter = {
-    rails: 0,
-    rocks: 10,
-    woods: 10
+    b: 0,
+    p: 0,
+    r: 0
 };
 let started = false;
 let currentLane;
@@ -75,30 +83,19 @@ const laneSpeeds = [2, 2.5, 3];
 const vechicleColors = [0xa52523, 0xbdb638, 0x78b14b];
 const threeHeights = [10];
 
-function Texture(width, height, rects) {
+function Texture(color, width, height, rects) {
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
     const context = canvas.getContext("2d");
-    context.fillStyle = "#ffffff";
+    context.fillStyle = '#FFF';
     context.fillRect(0, 0, width, height);
-    context.fillStyle = "rgba(0,0,0,0.6)";
+    context.fillStyle = color;
     rects.forEach(rect => {
         context.fillRect(rect.x, rect.y, rect.w, rect.h);
     });
     return new THREE.CanvasTexture(canvas);
 }
-
-
-const carFrontTexture = new Texture(40, 80, [{ x: 0, y: 10, w: 30, h: 60 }]);
-const carBackTexture = new Texture(40, 80, [{ x: 10, y: 10, w: 30, h: 60 }]);
-const carRightSideTexture = new Texture(110, 40, [{ x: 10, y: 0, w: 50, h: 30 }, { x: 70, y: 0, w: 30, h: 30 }]);
-const carLeftSideTexture = new Texture(110, 40, [{ x: 10, y: 10, w: 40, h: 30 }, { x: 60, y: 10, w: 40, h: 30 }]);
-
-const stationFrontTexture = new Texture(30, 30, [{ x: 15, y: 0, w: 10, h: 30 }]);
-const stationBackTexture = new Texture(30, 60, [{ x: 8, y: 3, w: 27, h: 16 }, { x: 5, y: 21, w: 27, h: 18 }, { x: 8, y: 41, w: 27, h: 16 }]);
-const stationLeftSideTexture = new Texture(25, 30, [{ x: 10, y: 0, w: 50, h: 30 }, { x: 70, y: 0, w: 30, h: 30 }]);
-const stationRightSideTexture = new Texture(25, 30, [{ x: 0, y: 5, w: 10, h: 10 }]);
 
 const generateLanes = () => [...Array(40).keys()].map(index => {
     const lane = new Lane(index);
@@ -109,26 +106,58 @@ const generateLanes = () => [...Array(40).keys()].map(index => {
 
 const generateTrain = () => {
     let train = new Train();
-    train.position.x = (9 * positionWidth) * zoom;
-    train.position.y = 5.5 * positionWidth * zoom;
-
-    let wagon = new Wagon('stock');
-    wagon.position.y = -2 * positionWidth * zoom;
-    train.add(wagon);
-
-    wagon2 = new Wagon('rail');
-    wagon2.position.y = -3.7 * positionWidth * zoom;
-    train.add(wagon2);
-    // train.scale(0.1, 0.1, 0.1);
-
-    // let car = new Car();
-
-    // car.position.x = (position * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2;
-    // car.position.y = 0 * positionWidth * zoom;
-    // car.rotation.z = - (Math.PI / 2);
-    // scene.add(car);
-
+    train.position.x = (train_position[0] * positionWidth) * zoom;
+    train.position.y = 6.8 * positionWidth * zoom;
     return train;
+}
+const generateWagonWater = () => {
+    let wwater = new Wagon('water');
+    wwater.position.x = (9 * positionWidth) * zoom;
+    wwater.position.y = 5.3 * positionWidth * zoom;
+
+    return wwater;
+}
+const generateWagonStock = () => {
+    let wstock = new Wagon('stock');
+    wstock.position.x = (9 * positionWidth) * zoom;
+    wstock.position.y = 3.7 * positionWidth * zoom;
+
+
+    const wstockbois = new THREE.Group();
+    for (let i = 0; i < 6; i++) {
+        let stock_bois = new Stock('bois');
+        stock_bois.position.z = 28;
+        stock_bois.position.y = 33 - (i * 5);
+        stock_bois.position.x = 20;
+        stock_bois.rotation.z = Math.PI;
+        stock_bois.rotation.x = Math.PI / 2;
+        stock_bois.visible = false;
+        wstockbois.add(stock_bois);
+    }
+
+
+    const wstockpierre = new THREE.Group();
+    for (let i = 0; i < 6; i++) {
+        let stock_pierre = new Stock('metal');
+        stock_pierre.position.z = 28;
+        stock_pierre.position.y = -24 + (i * 5);
+        stock_pierre.position.x = 20;
+        stock_pierre.rotation.z = Math.PI;
+        stock_pierre.rotation.x = Math.PI / 2;
+        stock_pierre.visible = false;
+        wstockpierre.add(stock_pierre);
+    }
+    wstock.add(wstockbois);
+    wstock.add(wstockpierre);
+
+    return wstock;
+}
+const generateWagonRails = () => {
+    wrail = new Wagon('rail');
+    wrail.position.x = (9 * positionWidth) * zoom;
+    wrail.position.y = 2.1 * positionWidth * zoom;
+
+    return wrail;
 }
 
 const addLane = () => {
