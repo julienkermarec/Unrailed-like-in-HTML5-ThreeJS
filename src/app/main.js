@@ -1,4 +1,4 @@
-const initaliseValues = () => {
+function initaliseValues() {
 
 
     water_bucket_position = [11, 2];
@@ -27,11 +27,12 @@ const initaliseValues = () => {
     moves = [];
     directions = [];
     moves_players = [];
-    stepStartTimestamp;
 
+    player = new Player(currentLane, currentColumn);
     player.position.x = currentColumn * positionWidth * zoom;
     player.position.y = currentLane * positionWidth * zoom;
-    players = [];
+    scene.add(player);
+
 
     camera.position.y = initialCameraPositionY;
     camera.position.x = initialCameraPositionX;
@@ -62,7 +63,7 @@ const initaliseValues = () => {
     start();
 };
 
-const renderer = new THREE.WebGLRenderer({
+renderer = new THREE.WebGLRenderer({
     alpha: true,
     antialias: true
 });
@@ -435,7 +436,7 @@ function action() {
         return cutRock(nextCell.column, nextCell.lane);
     // if (counter.rocks < 10 || counter.woods < 10)
     //     return;
-    // const rails = new Rails();
+    // rails = new Rails();
     // let position_x = finalPositions.column;
     // console.log("rails.position", rails.position);
     // rails.position.x = (position_x * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2;
@@ -522,11 +523,11 @@ function cutRock(column, lane) {
 
 function addPlayer(userId) {
 
-    players[userId] = new Player();
-    scene.add(players[userId]);
+    // players[userId] = new Player();
+    // scene.add(players[userId]);
 
 
-    // const positionX = (2 * positionWidth + positionWidth / 2) * zoom;
+    // positionX = (2 * positionWidth + positionWidth / 2) * zoom;
 
     // players[userId].position.x = positionX; // initial player position is 0
 
@@ -546,7 +547,7 @@ function move(pdirection, userId = null) {
             return moves_players.push({ userId: userId, direction: direction });
         }
     }
-    const finalPositions = moves.reduce((position, move) => {
+    finalPositions = moves.reduce((position, move) => {
         if (move === 'forward') return { lane: position.lane + 1, column: position.column };
         if (move === 'backward') return { lane: position.lane - 1, column: position.column };
         if (move === 'left') return { lane: position.lane, column: position.column - 1 };
@@ -634,7 +635,7 @@ function animate(timestamp) {
     requestAnimationFrame(animate);
 
     if (!previousTimestamp) previousTimestamp = timestamp;
-    const delta = timestamp - previousTimestamp;
+    delta = timestamp - previousTimestamp;
     previousTimestamp = timestamp;
 
     dirLight.position.x = initialDirLightPositionX;
@@ -757,13 +758,13 @@ function animate(timestamp) {
     }
 
     if (stepStartTimestamp) {
-        const moveDeltaTime = timestamp - stepStartTimestamp;
-        const moveDeltaDistance = Math.min(moveDeltaTime / stepTime, 1) * positionWidth * zoom;
-        const jumpDeltaDistance = Math.sin(Math.min(moveDeltaTime / stepTime, 1) * Math.PI) * 8 * zoom;
+        moveDeltaTime = timestamp - stepStartTimestamp;
+        moveDeltaDistance = Math.min(moveDeltaTime / stepTime, 1) * positionWidth * zoom;
+        jumpDeltaDistance = Math.sin(Math.min(moveDeltaTime / stepTime, 1) * Math.PI) * 8 * zoom;
         // console.log("moves[0]", moves[0]);
         switch (moves[0]) {
             case 'forward': {
-                const positionY = currentLane * positionWidth * zoom + moveDeltaDistance;
+                positionY = currentLane * positionWidth * zoom + moveDeltaDistance;
                 // dirLight.position.y = initialDirLightPositionY + positionY;
                 player.position.y = positionY;
                 player.position.z = jumpDeltaDistance;
@@ -779,7 +780,7 @@ function animate(timestamp) {
                 break;
             }
             case 'left': {
-                const positionX = (currentColumn * positionWidth) * zoom - moveDeltaDistance;
+                positionX = (currentColumn * positionWidth) * zoom - moveDeltaDistance;
                 // dirLight.position.x = initialDirLightPositionX + positionX;
                 player.position.x = positionX; // initial player position is 0
                 player.position.z = jumpDeltaDistance;
@@ -787,7 +788,7 @@ function animate(timestamp) {
                 break;
             }
             case 'right': {
-                const positionX = (currentColumn * positionWidth) * zoom + moveDeltaDistance;
+                positionX = (currentColumn * positionWidth) * zoom + moveDeltaDistance;
                 // dirLight.position.x = initialDirLightPositionX + positionX;
                 player.position.x = positionX;
                 player.position.z = jumpDeltaDistance;
@@ -884,12 +885,12 @@ function animate(timestamp) {
     }
 
     // if (lanes[currentLane].type === 'car' || lanes[currentLane].type === 'truck') {
-    //     const playerMinX = player.position.x - playerSize * zoom / 2;
-    //     const playerMaxX = player.position.x + playerSize * zoom / 2;
-    //     const vechicleLength = { car: 60, truck: 105 }[lanes[currentLane].type];
+    //     playerMinX = player.position.x - playerSize * zoom / 2;
+    //     playerMaxX = player.position.x + playerSize * zoom / 2;
+    //     vechicleLength = { car: 60, truck: 105 }[lanes[currentLane].type];
     //     lanes[currentLane].vechicles.forEach(vechicle => {
-    //         const carMinX = vechicle.position.x - vechicleLength * zoom / 2;
-    //         const carMaxX = vechicle.position.x + vechicleLength * zoom / 2;
+    //         carMinX = vechicle.position.x - vechicleLength * zoom / 2;
+    //         carMaxX = vechicle.position.x + vechicleLength * zoom / 2;
     //         if (playerMaxX > carMinX && playerMinX < carMaxX) {
     //             endDOM.style.visibility = 'visible';
     //         }
@@ -920,9 +921,6 @@ function init() {
 
     currentLane = 3;
     currentColumn = columns / 2;
-    player = new Player(currentLane, currentColumn);
-    scene.add(player);
-
 
     hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
     scene.add(hemiLight);
@@ -949,12 +947,13 @@ function init() {
     backLight.castShadow = true;
 }
 
-init();
-initaliseValues();
-updateCounter();
-renderer.render(scene, camera);
-requestAnimationFrame(animate);
+window.addEventListener("DOMContentLoaded", (event) => {
+    init();
+    initaliseValues();
+    updateCounter();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+    window.scene = scene;
+    window.THREE = THREE;
+});
 
-
-window.scene = scene;
-window.THREE = THREE;

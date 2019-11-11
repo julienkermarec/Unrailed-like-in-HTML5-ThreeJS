@@ -1,5 +1,5 @@
-let levels = [];
-let level_1 = [
+levels = [];
+level_1 = [
     ["e  ", "e  ", "e  ", "e  ", "ot ", "ot ", "bt ", "ot ", "rr ", "rr ", "rr ", "rr ", "w  ", "w  ", "w  ", "w  ", "mm ", "rr ", "rr ", "rr ", "ot ", "bt ", "bt ", "ot ", "w  ", "mm ", "mm ", "mm ", "mm ", "mm ", "mm ", "mm ", "mm ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  "],
     ["e  ", "e  ", "e  ", "e  ", "bt ", "bt ", "ot ", "bt ", "bt ", "rr ", "rr ", "rr ", "w  ", "w  ", "w  ", "mm ", "mm ", "mm ", "rr ", "rr ", "bt ", "ot ", "ot ", "bt ", "w  ", "mm ", "rr ", "rr ", "rr ", "rr ", "mm ", "mm ", "rr ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  "],
     ["e  ", "e  ", "e  ", "e  ", "ot ", "bt ", "bt ", "ot ", "ot ", "ot ", "gt ", "rr ", "w  ", "w  ", "w  ", "mm ", "mm ", "ot ", "bt ", "bt ", "ot ", "ot ", "bt ", "w  ", "w  ", "rr ", "rr ", "w  ", "w  ", "w  ", "rr ", "rr ", "rr ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  ", "g  "],

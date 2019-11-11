@@ -1,339 +1,31 @@
-
-function Player(current_y = null, current_x = null) {
-    const player = new THREE.Group();
-
-
-    //head
-    var head = new THREE.Mesh(
-        new THREE.BoxGeometry(20, 22, 19),
-        new THREE.MeshLambertMaterial({ color: "#ff0000", shading: THREE.FlatShading })
-    );
-    head.position.z = 70;
-    head.castShadow = true;
-    head.receiveShadow = false;
-
-
-    var eyel = new THREE.Mesh(
-        new THREE.BoxGeometry(1, 4, 7),
-        new THREE.MeshLambertMaterial({ color: "#ffffff", shading: THREE.FlatShading })
-    );
-    eyel.position.z = 5;
-    eyel.position.x = 10;
-    eyel.position.y = -5;
-
-    var eyer = new THREE.Mesh(
-        new THREE.BoxGeometry(1, 4, 7),
-        new THREE.MeshLambertMaterial({ color: "#ffffff", shading: THREE.FlatShading })
-    );
-    eyer.position.z = 5;
-    eyer.position.x = 10;
-    eyer.position.y = 5;
-
-    head.add(eyel);
-    head.add(eyer);
-
-    // neck
-    var neck = new THREE.Mesh(
-        new THREE.BoxGeometry(18, 20, 4),
-        new THREE.MeshLambertMaterial({ color: 0xe0bea5, shading: THREE.FlatShading })
-    );
-    neck.position.z = 60;
-    neck.castShadow = true;
-    neck.receiveShadow = false;
-
-    // BODY
-    const body = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(positionWidth / 3 * zoom, positionWidth / 2 * zoom, 15 * zoom),
-        new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true }));
-    body.position.z = 20 * zoom;
-    body.castShadow = true;
-    body.receiveShadow = false;
-
-    //HANDS 
-    const handl = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(4 * zoom, 4 * zoom, 12 * zoom),
-        new THREE.MeshPhongMaterial({ color: 0xe0bea5, flatShading: true }));
-    handl.position.z = 0 * zoom;
-    handl.position.y = -6 * zoom;
-    handl.castShadow = true;
-    handl.receiveShadow = false;
-
-    const handr = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(4 * zoom, 4 * zoom, 12 * zoom),
-        new THREE.MeshPhongMaterial({ color: 0xe0bea5, flatShading: true }));
-    handr.position.z = 0 * zoom;
-    handr.position.y = 6 * zoom;
-    handr.castShadow = true;
-    handr.receiveShadow = false;
-
-    const pick11 = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(4 * zoom, 15 * zoom, 2 * zoom),
-        new THREE.MeshPhongMaterial({ color: "black", flatShading: true }));
-    pick11.position.x = 7 * zoom;
-    pick11.position.z = 3 * zoom;
-    pick11.position.y = 0 * zoom;
-    pick11.position.y = 0 * zoom;
-    pick11.castShadow = true;
-    pick11.receiveShadow = false;
-    pick11.visible = false;
-
-    const pick12 = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(4 * zoom, 15 * zoom, 2 * zoom),
-        new THREE.MeshPhongMaterial({ color: "black", flatShading: true }));
-    pick12.position.x = 14 * zoom;
-    pick12.position.z = 3 * zoom;
-    pick12.position.y = 0 * zoom;
-    pick12.castShadow = true;
-    pick12.receiveShadow = false;
-    pick12.visible = false;
-
-    const pick21 = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(15 * zoom, 4 * zoom, 2 * zoom),
-        new THREE.MeshPhongMaterial({ color: "red", flatShading: true }));
-    pick21.position.x = 11 * zoom;
-    pick21.position.z = 5 * zoom;
-    pick21.position.y = 4 * zoom;
-    pick21.castShadow = true;
-    pick21.receiveShadow = false;
-    pick21.visible = false;
-
-    const pick22 = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(15 * zoom, 4 * zoom, 2 * zoom),
-        new THREE.MeshPhongMaterial({ color: "red", flatShading: true }));
-    pick22.position.x = 11 * zoom;
-    pick22.position.z = 5 * zoom;
-    pick22.position.y = -4 * zoom;
-    pick22.castShadow = true;
-    pick22.receiveShadow = false;
-    pick22.visible = false;
-
-    const pick31 = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(4 * zoom, 15 * zoom, 2 * zoom),
-        new THREE.MeshPhongMaterial({ color: "blue", flatShading: true }));
-    pick31.position.x = 7 * zoom;
-    pick31.position.z = 7 * zoom;
-    pick31.position.y = 0 * zoom;
-    pick31.castShadow = true;
-    pick31.receiveShadow = false;
-    pick31.visible = false;
-
-    const pick32 = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(4 * zoom, 15 * zoom, 2 * zoom),
-        new THREE.MeshPhongMaterial({ color: "blue", flatShading: true }));
-    pick32.position.x = 14 * zoom;
-    pick32.position.z = 7 * zoom;
-    pick32.position.y = 0 * zoom;
-    pick32.castShadow = true;
-    pick32.receiveShadow = false;
-    pick32.visible = false;
-
-
-    let rails_1 = new Rails();
-    rails_1.position.x = (positionWidth / 1.5) * zoom;
-    rails_1.position.z = 5;
-    rails_1.visible = false;
-    let rails_2 = new Rails();
-    rails_2.position.x = (positionWidth / 1.3) * zoom;
-    rails_2.position.z = 15;
-    rails_2.rotation.z = Math.PI / 2;
-    rails_2.visible = false;
-    let rails_3 = new Rails();
-    rails_3.position.x = (positionWidth / 1.5) * zoom;
-    rails_3.position.z = 25;
-    rails_3.visible = false;
-
-    wb = new WaterBucket();
-    wb.position.x = positionWidth / 2 * zoom;
-    wb.children[1].visible = false;
-    wb.visible = false;
-    h = new Hache();
-    h.position.x = positionWidth / 2 * zoom;
-    h.position.y = -(positionWidth / 3) * zoom;
-    h.position.z = positionWidth / 2 * zoom;
-    h.children[2].visible = false;
-    h.rotation.x = Math.PI / 2;
-    h.rotation.z = -Math.PI / 2;
-    h.visible = false;
-    a = new Axe();
-    a.position.x = positionWidth / 2 * zoom;
-    a.position.y = -(positionWidth / 3) * zoom;
-    a.position.z = positionWidth / 2 * zoom;
-    a.children[4].visible = false;
-    a.rotation.x = Math.PI / 2;
-    a.rotation.z = -Math.PI / 2;
-    a.visible = false;
-    body.add(handl);
-    body.add(handr);
-    body.add(pick11);
-    body.add(pick12);
-    body.add(pick21);
-    body.add(pick22);
-    body.add(pick31);
-    body.add(pick32);
-    body.add(rails_1);
-    body.add(rails_2);
-    body.add(rails_3);
-    body.add(wb);
-    body.add(h);
-    body.add(a);
-
-
-    // PIEDS
-    const piedsl = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(3 * zoom, 3 * zoom, 12 * zoom),
-        new THREE.MeshPhongMaterial({ color: 0x755b0b, flatShading: true }));
-    piedsl.position.z = 6 * zoom;
-    piedsl.position.y = 3 * zoom;
-    piedsl.castShadow = true;
-    piedsl.receiveShadow = true;
-
-
-    const piedsr = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(3 * zoom, 3 * zoom, 12 * zoom),
-        new THREE.MeshPhongMaterial({ color: 0x755b0b, flatShading: true }));
-    piedsr.position.z = 6 * zoom;
-    piedsr.position.y = -3 * zoom;
-    piedsr.castShadow = true;
-    piedsr.receiveShadow = true;
-
-
-    player.position.x = current_x * positionWidth * zoom;
-    player.position.y = current_y * positionWidth * zoom;
-
-    player.add(head);
-    player.add(neck);
-    player.add(body);
-    player.add(piedsl);
-    player.add(piedsr);
-
-    const rowel = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(2 * zoom, 4 * zoom, 2 * zoom),
-        new THREE.MeshLambertMaterial({ color: 0xF0619A, flatShading: true }));
-
-    rowel.position.z = 21 * zoom;
-    rowel.castShadow = true;
-    rowel.receiveShadow = false;
-    player.add(rowel);
-
-    return player;
+/** OBJECTS */
+function Texture(color, width, height, rects = []) {
+    canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    context = canvas.getContext("2d");
+    context.fillStyle = '#FFF';
+    context.fillRect(0, 0, width, height);
+    context.fillStyle = color;
+    rects.forEach(rect => {
+        context.fillRect(rect.x, rect.y, rect.w, rect.h);
+    });
+    return new THREE.CanvasTexture(canvas);
 }
 
 
-function Hache() {
-    const ag = new THREE.Group();
-
-    const a = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(3 * zoom, 6 * zoom, 2),
-        new THREE.MeshPhongMaterial({ color: colors.metal, flatShading: true }));
-    a.position.z = 2;
-    a.position.x = -10;
-    ag.add(a);
-    const a2 = new THREE.Mesh(
-        new THREE.BoxBufferGeometry((positionWidth - 8) * zoom, 2 * zoom, 2),
-        new THREE.MeshPhongMaterial({ color: colors.bois, flatShading: true }));
-    a2.position.z = 1;
-    a2.position.x = 4;
-    a2.position.y = -3;
-    ag.add(a2);
-
-
-    const infoTexture = new Texture('#45be6f', positionWidth * zoom * 2, positionWidth * zoom * 2, [
-        { x: 0, y: 0, w: 10, h: positionWidth * zoom * 2 },
-        { x: 0, y: 0, w: positionWidth * zoom * 2, h: 20 },
-        { x: 0, y: 0, w: 20, h: 40 },
-        { x: 40, y: 0, w: 30, h: 40 },
-        { x: 0, y: positionWidth * zoom * 2 - 30, w: positionWidth * zoom * 2, h: 30 },
-        { x: positionWidth * zoom * 2 - 10, y: 0, w: 30, h: positionWidth * zoom * 2 },
-    ]);
-
-    const ai = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(1, positionWidth / 1.5 * zoom, positionWidth / 1.5 * zoom),
-        [
-            new THREE.MeshPhongMaterial({ color: '#FFF', flatShading: true, map: infoTexture }),
-            new THREE.MeshPhongMaterial({ color: colors.sapin, flatShading: true }),
-            new THREE.MeshPhongMaterial({ color: colors.sapin, flatShading: true }),
-            new THREE.MeshPhongMaterial({ color: colors.sapin, flatShading: true }),
-            new THREE.MeshPhongMaterial({ color: colors.sapin, flatShading: true }), // top
-            new THREE.MeshPhongMaterial({ color: colors.sapin, flatShading: true }) // bottom
-        ]);
-    ai.position.z = positionWidth * zoom;
-    ai.position.x = -positionWidth / 2 * zoom;
-    ag.add(ai);
-
-    return ag;
-}
-function Axe() {
-    const hg = new THREE.Group();
-
-    const h = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(1.5 * zoom, 10 * zoom, 2),
-        new THREE.MeshPhongMaterial({ color: colors.metal, flatShading: true }));
-    h.position.z = 2;
-    h.position.x = -10;
-    hg.add(h);
-    const h2 = new THREE.Mesh(
-        new THREE.BoxBufferGeometry((positionWidth - 8) * zoom, 2 * zoom, 2),
-        new THREE.MeshPhongMaterial({ color: colors.bois, flatShading: true }));
-    h2.position.z = 1;
-    h2.position.x = 2;
-    h2.position.y = 0;
-    hg.add(h2);
-    const h3 = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(1.5 * zoom, 1.5 * zoom, 2),
-        new THREE.MeshPhongMaterial({ color: colors.metal, flatShading: true }));
-    h3.position.z = 2;
-    h3.position.x = -8;
-    h3.position.y = -11;
-    hg.add(h3);
-    const h4 = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(1.5 * zoom, 1.5 * zoom, 2),
-        new THREE.MeshPhongMaterial({ color: colors.metal, flatShading: true }));
-    h4.position.z = 2;
-    h4.position.x = -8;
-    h4.position.y = 11;
-    hg.add(h4);
-
-    infoTexture = new Texture('#f274d6', positionWidth * zoom * 2, positionWidth * zoom * 2, [
-        { x: 0, y: 0, w: 10, h: positionWidth * zoom * 2 }, //haut
-        { x: positionWidth * zoom * 2 - 10, y: 0, w: 10, h: positionWidth * zoom * 2 }, //bas
-        { x: 0, y: 0, w: positionWidth * zoom * 2, h: 10 }, //droite
-        { x: 0, y: positionWidth * zoom * 2 - 10, w: positionWidth * zoom * 2, h: 10 }, //gauche
-        { x: 30, y: 0, w: 90, h: 35 }, // int droit
-        { x: 20, y: 18, w: 10, h: 17 }, // int droit 2
-        { x: 30, y: 45, w: 80, h: 40 }, // int gauche
-        { x: 20, y: 45, w: 10, h: 17 }, // int gauche 2
-        { x: 0, y: 0, w: 16, h: 16 }, // coin haut droit
-        { x: 0, y: positionWidth * zoom * 2 - 16, w: 16, h: 16 }, // coin haut gauche
-    ]);
-
-    const hi = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(1, positionWidth / 1.5 * zoom, positionWidth / 1.5 * zoom),
-        [
-            new THREE.MeshPhongMaterial({ color: '#FFF', flatShading: true, map: infoTexture }),
-            new THREE.MeshPhongMaterial({ color: colors.pink, flatShading: true }),
-            new THREE.MeshPhongMaterial({ color: colors.pink, flatShading: true }),
-            new THREE.MeshPhongMaterial({ color: colors.pink, flatShading: true }),
-            new THREE.MeshPhongMaterial({ color: colors.pink, flatShading: true }), // top
-            new THREE.MeshPhongMaterial({ color: colors.pink, flatShading: true }) // bottom
-        ]);
-    hi.position.z = positionWidth * zoom;
-    hi.position.x = -positionWidth / 2 * zoom;
-    hg.add(hi);
-
-    return hg;
-}
 function WaterBucket() {
 
-    const wbg = new THREE.Group();
+    wbg = new THREE.Group();
 
-    const wb = new THREE.Mesh(
+    wb = new THREE.Mesh(
         new THREE.BoxBufferGeometry(positionWidth - 4 / 2 * zoom, positionWidth - 4 / 2 * zoom, positionWidth / 4 * zoom),
         new THREE.MeshPhongMaterial({ color: colors.water, flatShading: true }));
     wb.position.z = (positionWidth) / 4 * zoom;
     wbg.add(wb);
 
 
-    const infoTexture = new Texture('#00ffe0', positionWidth * zoom * 2, positionWidth * zoom * 2, [
+    infoTexture = new Texture('#00ffe0', positionWidth * zoom * 2, positionWidth * zoom * 2, [
         { x: 0, y: 0, w: 10, h: positionWidth * zoom * 2 },
         { x: 0, y: 0, w: positionWidth * zoom * 2, h: 10 },
         { x: positionWidth * zoom * 2 - 10, y: 0, w: 10, h: positionWidth * zoom * 2 },
@@ -341,7 +33,7 @@ function WaterBucket() {
         { x: 25, y: 20, w: 10, h: positionWidth * zoom * 2 - 40 },
     ]);
 
-    const wbi = new THREE.Mesh(
+    wbi = new THREE.Mesh(
         new THREE.BoxBufferGeometry(1, positionWidth / 1.5 * zoom, positionWidth / 1.5 * zoom),
         [
             new THREE.MeshPhongMaterial({ color: '#FFF', flatShading: true, map: infoTexture }),
@@ -385,7 +77,7 @@ function WaterBucket() {
         }
     ]
     for (let bord of bords) {
-        const ba = new THREE.Mesh(
+        ba = new THREE.Mesh(
             new THREE.BoxBufferGeometry(bord.w * zoom, bord.d * zoom, bord.h * zoom),
             new THREE.MeshPhongMaterial({ color: colors.bois, flatShading: true }));
         ba.castShadow = true;
@@ -398,15 +90,340 @@ function WaterBucket() {
 
     return wbg;
 }
+
+function Player(current_y = null, current_x = null) {
+    playerg = new THREE.Group();
+
+
+    //head
+    var head = new THREE.Mesh(
+        new THREE.BoxGeometry(20, 22, 19),
+        new THREE.MeshLambertMaterial({ color: "#ff0000", flatShading: true })
+    );
+    head.position.z = 70;
+    head.castShadow = true;
+    head.receiveShadow = false;
+
+
+    var eyel = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 4, 7),
+        new THREE.MeshLambertMaterial({ color: "#ffffff", flatShading: true })
+    );
+    eyel.position.z = 5;
+    eyel.position.x = 10;
+    eyel.position.y = -5;
+
+    var eyer = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 4, 7),
+        new THREE.MeshLambertMaterial({ color: "#ffffff", flatShading: true })
+    );
+    eyer.position.z = 5;
+    eyer.position.x = 10;
+    eyer.position.y = 5;
+
+    head.add(eyel);
+    head.add(eyer);
+
+    // neck
+    var neck = new THREE.Mesh(
+        new THREE.BoxGeometry(18, 20, 4),
+        new THREE.MeshLambertMaterial({ color: 0xe0bea5, flatShading: true })
+    );
+    neck.position.z = 60;
+    neck.castShadow = true;
+    neck.receiveShadow = false;
+
+    // BODY
+    body = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(positionWidth / 3 * zoom, positionWidth / 2 * zoom, 15 * zoom),
+        new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true }));
+    body.position.z = 20 * zoom;
+    body.castShadow = true;
+    body.receiveShadow = false;
+
+    //HANDS 
+    handl = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(4 * zoom, 4 * zoom, 12 * zoom),
+        new THREE.MeshPhongMaterial({ color: 0xe0bea5, flatShading: true }));
+    handl.position.z = 0 * zoom;
+    handl.position.y = -6 * zoom;
+    handl.castShadow = true;
+    handl.receiveShadow = false;
+
+    handr = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(4 * zoom, 4 * zoom, 12 * zoom),
+        new THREE.MeshPhongMaterial({ color: 0xe0bea5, flatShading: true }));
+    handr.position.z = 0 * zoom;
+    handr.position.y = 6 * zoom;
+    handr.castShadow = true;
+    handr.receiveShadow = false;
+
+    pick11 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(4 * zoom, 15 * zoom, 2 * zoom),
+        new THREE.MeshPhongMaterial({ color: "black", flatShading: true }));
+    pick11.position.x = 7 * zoom;
+    pick11.position.z = 3 * zoom;
+    pick11.position.y = 0 * zoom;
+    pick11.position.y = 0 * zoom;
+    pick11.castShadow = true;
+    pick11.receiveShadow = false;
+    pick11.visible = false;
+
+    pick12 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(4 * zoom, 15 * zoom, 2 * zoom),
+        new THREE.MeshPhongMaterial({ color: "black", flatShading: true }));
+    pick12.position.x = 14 * zoom;
+    pick12.position.z = 3 * zoom;
+    pick12.position.y = 0 * zoom;
+    pick12.castShadow = true;
+    pick12.receiveShadow = false;
+    pick12.visible = false;
+
+    pick21 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(15 * zoom, 4 * zoom, 2 * zoom),
+        new THREE.MeshPhongMaterial({ color: "red", flatShading: true }));
+    pick21.position.x = 11 * zoom;
+    pick21.position.z = 5 * zoom;
+    pick21.position.y = 4 * zoom;
+    pick21.castShadow = true;
+    pick21.receiveShadow = false;
+    pick21.visible = false;
+
+    pick22 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(15 * zoom, 4 * zoom, 2 * zoom),
+        new THREE.MeshPhongMaterial({ color: "red", flatShading: true }));
+    pick22.position.x = 11 * zoom;
+    pick22.position.z = 5 * zoom;
+    pick22.position.y = -4 * zoom;
+    pick22.castShadow = true;
+    pick22.receiveShadow = false;
+    pick22.visible = false;
+
+    pick31 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(4 * zoom, 15 * zoom, 2 * zoom),
+        new THREE.MeshPhongMaterial({ color: "blue", flatShading: true }));
+    pick31.position.x = 7 * zoom;
+    pick31.position.z = 7 * zoom;
+    pick31.position.y = 0 * zoom;
+    pick31.castShadow = true;
+    pick31.receiveShadow = false;
+    pick31.visible = false;
+
+    pick32 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(4 * zoom, 15 * zoom, 2 * zoom),
+        new THREE.MeshPhongMaterial({ color: "blue", flatShading: true }));
+    pick32.position.x = 14 * zoom;
+    pick32.position.z = 7 * zoom;
+    pick32.position.y = 0 * zoom;
+    pick32.castShadow = true;
+    pick32.receiveShadow = false;
+    pick32.visible = false;
+
+
+    let rails_1 = new Rails();
+    rails_1.position.x = (positionWidth / 1.5) * zoom;
+    rails_1.position.z = 5;
+    rails_1.visible = false;
+    let rails_2 = new Rails();
+    rails_2.position.x = (positionWidth / 1.3) * zoom;
+    rails_2.position.z = 15;
+    rails_2.rotation.z = Math.PI / 2;
+    rails_2.visible = false;
+    let rails_3 = new Rails();
+    rails_3.position.x = (positionWidth / 1.5) * zoom;
+    rails_3.position.z = 25;
+    rails_3.visible = false;
+
+    wb = new WaterBucket();
+    wb.position.x = positionWidth / 2 * zoom;
+    wb.children[1].visible = false;
+    wb.visible = false;
+
+    ha = new Hache();
+    ha.position.x = positionWidth / 2 * zoom;
+    ha.position.y = -(positionWidth / 3) * zoom;
+    ha.position.z = positionWidth / 2 * zoom;
+    ha.children[2].visible = false;
+    ha.rotation.x = Math.PI / 2;
+    ha.rotation.z = -Math.PI / 2;
+    ha.visible = false;
+
+    a = new Axe();
+    a.position.x = positionWidth / 2 * zoom;
+    a.position.y = -(positionWidth / 3) * zoom;
+    a.position.z = positionWidth / 2 * zoom;
+    a.children[4].visible = false;
+    a.rotation.x = Math.PI / 2;
+    a.rotation.z = -Math.PI / 2;
+    a.visible = false;
+
+    body.add(handl);
+    body.add(handr);
+    body.add(pick11);
+    body.add(pick12);
+    body.add(pick21);
+    body.add(pick22);
+    body.add(pick31);
+    body.add(pick32);
+    body.add(rails_1);
+    body.add(rails_2);
+    body.add(rails_3);
+    body.add(wb);
+    body.add(ha);
+    body.add(a);
+
+
+    // PIEDS
+    piedsl = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(3 * zoom, 3 * zoom, 12 * zoom),
+        new THREE.MeshPhongMaterial({ color: 0x755b0b, flatShading: true }));
+    piedsl.position.z = 6 * zoom;
+    piedsl.position.y = 3 * zoom;
+    piedsl.castShadow = true;
+    piedsl.receiveShadow = true;
+
+
+    piedsr = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(3 * zoom, 3 * zoom, 12 * zoom),
+        new THREE.MeshPhongMaterial({ color: 0x755b0b, flatShading: true }));
+    piedsr.position.z = 6 * zoom;
+    piedsr.position.y = -3 * zoom;
+    piedsr.castShadow = true;
+    piedsr.receiveShadow = true;
+
+
+    playerg.position.x = current_x * positionWidth * zoom;
+    playerg.position.y = current_y * positionWidth * zoom;
+
+    playerg.add(head);
+    playerg.add(neck);
+    playerg.add(body);
+    playerg.add(piedsl);
+    playerg.add(piedsr);
+
+    return playerg;
+}
+
+
+function Hache() {
+    ag = new THREE.Group();
+
+    a = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(3 * zoom, 6 * zoom, 2),
+        new THREE.MeshPhongMaterial({ color: colors.metal, flatShading: true }));
+    a.position.z = 2;
+    a.position.x = -10;
+    a.position.y = 0;
+
+    ag.add(a);
+
+    a2 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry((positionWidth - 8) * zoom, 2 * zoom, 2),
+        new THREE.MeshPhongMaterial({ color: colors.bois, flatShading: true }));
+    a2.position.z = 1;
+    a2.position.x = 4;
+    a2.position.y = -3;
+    ag.add(a2);
+
+
+    infoTexture = new Texture('#45be6f', positionWidth * zoom * 2, positionWidth * zoom * 2, [
+        { x: 0, y: 0, w: 10, h: positionWidth * zoom * 2 },
+        { x: 0, y: 0, w: positionWidth * zoom * 2, h: 20 },
+        { x: 0, y: 0, w: 20, h: 40 },
+        { x: 40, y: 0, w: 30, h: 40 },
+        { x: 0, y: positionWidth * zoom * 2 - 30, w: positionWidth * zoom * 2, h: 30 },
+        { x: positionWidth * zoom * 2 - 10, y: 0, w: 30, h: positionWidth * zoom * 2 },
+    ]);
+
+    ai = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(1, positionWidth / 1.5 * zoom, positionWidth / 1.5 * zoom),
+        [
+            new THREE.MeshPhongMaterial({ color: '#FFF', flatShading: true, map: infoTexture }),
+            new THREE.MeshPhongMaterial({ color: colors.sapin, flatShading: true }),
+            new THREE.MeshPhongMaterial({ color: colors.sapin, flatShading: true }),
+            new THREE.MeshPhongMaterial({ color: colors.sapin, flatShading: true }),
+            new THREE.MeshPhongMaterial({ color: colors.sapin, flatShading: true }), // top
+            new THREE.MeshPhongMaterial({ color: colors.sapin, flatShading: true }) // bottom
+        ]);
+    ai.position.z = positionWidth * zoom;
+    ai.position.x = -positionWidth / 2 * zoom;
+    ag.add(ai);
+
+    return ag;
+}
+
+function Axe() {
+    hg = new THREE.Group();
+
+    h = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(1.5 * zoom, 10 * zoom, 2),
+        new THREE.MeshPhongMaterial({ color: colors.metal, flatShading: true }));
+    h.position.z = 2;
+    h.position.x = -10;
+    h.position.y = 0;
+    hg.add(h);
+
+    h2 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry((positionWidth - 8) * zoom, 2 * zoom, 2),
+        new THREE.MeshPhongMaterial({ color: colors.bois, flatShading: true }));
+    h2.position.z = 1;
+    h2.position.x = 2;
+    h2.position.y = 0;
+    hg.add(h2);
+
+    h3 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(1.5 * zoom, 1.5 * zoom, 2),
+        new THREE.MeshPhongMaterial({ color: colors.metal, flatShading: true }));
+    h3.position.z = 2;
+    h3.position.x = -8;
+    h3.position.y = -11;
+    hg.add(h3);
+    h4 = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(1.5 * zoom, 1.5 * zoom, 2),
+        new THREE.MeshPhongMaterial({ color: colors.metal, flatShading: true }));
+    h4.position.z = 2;
+    h4.position.x = -8;
+    h4.position.y = 11;
+    hg.add(h4);
+
+    infoTexture = new Texture('#f274d6', positionWidth * zoom * 2, positionWidth * zoom * 2, [
+        { x: 0, y: 0, w: 10, h: positionWidth * zoom * 2 }, //haut
+        { x: positionWidth * zoom * 2 - 10, y: 0, w: 10, h: positionWidth * zoom * 2 }, //bas
+        { x: 0, y: 0, w: positionWidth * zoom * 2, h: 10 }, //droite
+        { x: 0, y: positionWidth * zoom * 2 - 10, w: positionWidth * zoom * 2, h: 10 }, //gauche
+        { x: 30, y: 0, w: 90, h: 35 }, // int droit
+        { x: 20, y: 18, w: 10, h: 17 }, // int droit 2
+        { x: 30, y: 45, w: 80, h: 40 }, // int gauche
+        { x: 20, y: 45, w: 10, h: 17 }, // int gauche 2
+        { x: 0, y: 0, w: 16, h: 16 }, // coin haut droit
+        { x: 0, y: positionWidth * zoom * 2 - 16, w: 16, h: 16 }, // coin haut gauche
+    ]);
+
+    hi = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(1, positionWidth / 1.5 * zoom, positionWidth / 1.5 * zoom),
+        [
+            new THREE.MeshPhongMaterial({ color: '#FFF', flatShading: true, map: infoTexture }),
+            new THREE.MeshPhongMaterial({ color: colors.pink, flatShading: true }),
+            new THREE.MeshPhongMaterial({ color: colors.pink, flatShading: true }),
+            new THREE.MeshPhongMaterial({ color: colors.pink, flatShading: true }),
+            new THREE.MeshPhongMaterial({ color: colors.pink, flatShading: true }), // top
+            new THREE.MeshPhongMaterial({ color: colors.pink, flatShading: true }) // bottom
+        ]);
+    hi.position.z = positionWidth * zoom;
+    hi.position.x = -positionWidth / 2 * zoom;
+    hg.add(hi);
+
+    return hg;
+}
 function Stock(type) {
 
-    const stock = new THREE.Group();
+    stock = new THREE.Group();
     stock.position.x = 0;
     stock.position.y = -(positionWidth);
     stock.position.z = 0;
     stock.rotation.z = Math.PI / 2;
 
-    const pick11 = new THREE.Mesh(
+    pick11 = new THREE.Mesh(
         new THREE.BoxBufferGeometry(4 * zoom, 15 * zoom, 2 * zoom),
         new THREE.MeshPhongMaterial({ color: colors[type], flatShading: true }));
     pick11.position.x = 7 * zoom;
@@ -417,7 +434,7 @@ function Stock(type) {
     pick11.receiveShadow = false;
     pick11.visible = true;
 
-    const pick12 = new THREE.Mesh(
+    pick12 = new THREE.Mesh(
         new THREE.BoxBufferGeometry(4 * zoom, 15 * zoom, 2 * zoom),
         new THREE.MeshPhongMaterial({ color: colors[type], flatShading: true }));
     pick12.position.x = 14 * zoom;
@@ -434,7 +451,7 @@ function Stock(type) {
 }
 
 function WaterGround() {
-    const waterground = new THREE.Group();
+    waterground = new THREE.Group();
 
     let bords = [
         {
@@ -466,7 +483,7 @@ function WaterGround() {
         }
     ]
     for (let bord of bords) {
-        const ba = new THREE.Mesh(
+        ba = new THREE.Mesh(
             new THREE.BoxBufferGeometry(bord.w * zoom, bord.d * zoom, bord.h * zoom),
             new THREE.MeshPhongMaterial({ color: colors.rail, flatShading: true }));
         ba.castShadow = true;
@@ -477,7 +494,7 @@ function WaterGround() {
         waterground.add(ba);
     }
 
-    const ba = new THREE.Mesh(
+    ba = new THREE.Mesh(
         new THREE.BoxBufferGeometry(positionWidth * zoom, 2 * zoom, 4 * zoom),
         new THREE.MeshPhongMaterial({ color: colors.rail, flatShading: true }));
     ba.castShadow = true;
@@ -522,9 +539,9 @@ function Wagon(type) {
             p = positionWidth * 1;
         }
     }
-    const wagon = new THREE.Group();
+    wagon = new THREE.Group();
 
-    const main = new THREE.Mesh(
+    main = new THREE.Mesh(
         new THREE.BoxBufferGeometry((positionWidth - 2) * zoom, p * zoom, size * zoom),
         new THREE.MeshPhongMaterial({ color: colors[color], flatShading: false }));
     main.position.z = (7 + size / 2) * zoom;
@@ -533,7 +550,7 @@ function Wagon(type) {
     if (type == 'water') {
         main.material.opacity = 0.5;
         main.material.transparent = true;
-        const water = new THREE.Mesh(
+        water = new THREE.Mesh(
             new THREE.BoxBufferGeometry((positionWidth - 3) * zoom, (p - 3) * zoom, (size - 3) * zoom),
             new THREE.MeshPhongMaterial({ color: colors['blue'], flatShading: false }));
         // water.position.z = (7 + (size - 4) / 2) * zoom;
@@ -572,7 +589,7 @@ function Wagon(type) {
         }
     ]
     for (let bord of bords) {
-        const ba = new THREE.Mesh(
+        ba = new THREE.Mesh(
             new THREE.BoxBufferGeometry(bord.w * zoom, bord.d * zoom, bord.h * zoom),
             new THREE.MeshPhongMaterial({ color: bords_color, flatShading: true }));
         ba.castShadow = true;
@@ -591,7 +608,7 @@ function Wagon(type) {
         z: p / 2 + 5,
     };
     if (color != 'red') {
-        const attache = new THREE.Mesh(
+        attache = new THREE.Mesh(
             new THREE.BoxBufferGeometry(ad.w * zoom, ad.d * zoom, ad.h * zoom),
             new THREE.MeshPhongMaterial({ color: colors.gray, flatShading: true }));
         attache.castShadow = true;
@@ -621,7 +638,7 @@ function Wagon(type) {
         }
     ];
     for (let wh of wheels) {
-        const wheel = new THREE.Mesh(
+        wheel = new THREE.Mesh(
             new THREE.CylinderBufferGeometry(wh.w * zoom, wh.w / 3 * zoom, wh.h * zoom, wh.d * zoom),
             new THREE.MeshPhongMaterial({ color: colors.black, flatShading: true }));
 
@@ -638,9 +655,9 @@ function Wagon(type) {
 }
 function Smoke() {
 
-    const smoke = new THREE.Group();
+    smoke = new THREE.Group();
 
-    const main = new THREE.Mesh(
+    main = new THREE.Mesh(
         new THREE.BoxBufferGeometry(positionWidth / 8 * zoom, positionWidth / 8 * zoom, positionWidth / 8 * zoom),
         new THREE.MeshPhongMaterial({ opacity: 0.99, transparent: true, color: 0xffffff, flatShading: false }));
 
@@ -652,15 +669,15 @@ function Smoke() {
 }
 function Train() {
 
-    const wagon = new THREE.Group();
+    wagong = new THREE.Group();
 
-    const main = new Wagon('train');
+    wagon = new Wagon('train');
 
-    const carBackTexture = new Texture("#000", 40, 80, [{ x: 10, y: 10, w: 30, h: 60 }]);
-    const carLeftSideTexture = new Texture("#000", 110, 40, [{ x: 10, y: 10, w: 40, h: 30 }, { x: 60, y: 10, w: 40, h: 30 }]);
+    carBackTexture = new Texture("#000", 40, 80, [{ x: 10, y: 10, w: 30, h: 60 }]);
+    carLeftSideTexture = new Texture("#000", 110, 40, [{ x: 10, y: 10, w: 40, h: 30 }, { x: 60, y: 10, w: 40, h: 30 }]);
 
 
-    const cabin = new THREE.Mesh(
+    cabin = new THREE.Mesh(
         new THREE.BoxBufferGeometry((positionWidth - 2) * zoom, (positionWidth - 4) * zoom, positionWidth / 2 * zoom),
         [
             new THREE.MeshPhongMaterial({ color: 0xcccccc, flatShading: true, map: carBackTexture }),
@@ -676,9 +693,9 @@ function Train() {
     cabin.castShadow = true;
     cabin.receiveShadow = true;
 
-    main.add(cabin);
+    wagon.add(cabin);
 
-    const noise = new THREE.Mesh(
+    noise = new THREE.Mesh(
         new THREE.CylinderBufferGeometry(3 * zoom, 2 * zoom, 11 * zoom, 11 * zoom),
         new THREE.MeshPhongMaterial({ color: colors.black, flatShading: true }));
     noise.castShadow = true;
@@ -688,35 +705,35 @@ function Train() {
     noise.position.z = 25 * zoom;
 
     noise.rotation.x = Math.PI / 2;
-    main.add(noise);
+    wagon.add(noise);
 
-    wagon.add(main);
+    wagong.add(wagon);
 
     for (let i = 0; i <= train_countdown / 100; i++) {
         let countdown = new TrainCountdown(i);
         countdown.visible = false;
-        wagon.add(countdown);
+        wagong.add(countdown);
     }
 
-    return wagon;
+    return wagong;
 }
 
 
 
 function Rails() {
-    const three = new THREE.Group();
+    three = new THREE.Group();
 
 
-    const createTraverses = () => new THREE.Mesh(
+    createTraverses = () => new THREE.Mesh(
         new THREE.BoxBufferGeometry(positionWidth * zoom, 3 * zoom, 2 * zoom),
         new THREE.MeshPhongMaterial({ color: 0x4d2926, flatShading: true }));
 
-    const createRail = () => new THREE.Mesh(
+    createRail = () => new THREE.Mesh(
         new THREE.BoxBufferGeometry(2 * zoom, positionWidth * zoom, 2 * zoom),
         new THREE.MeshPhongMaterial({ color: colors.rail, flatShading: true }));
 
     for (let i = 0; i < 3; i++) {
-        const middle = createTraverses();
+        middle = createTraverses();
         middle.receiveShadow = true;
         middle.castShadow = true;
         middle.position.x = 1 * zoom;
@@ -725,14 +742,14 @@ function Rails() {
         three.add(middle);
     }
 
-    const rail_left = createRail();
+    rail_left = createRail();
     rail_left.receiveShadow = true;
     rail_left.castShadow = true;
     rail_left.position.z = 2 * zoom;
     rail_left.position.x = ((-(positionWidth / 2)) + 5) * zoom;
     three.add(rail_left);
 
-    const rail_right = createRail();
+    rail_right = createRail();
     rail_right.position.x = ((positionWidth / 2) - 2) * zoom;
     rail_right.receiveShadow = true;
     rail_right.castShadow = true;
@@ -744,10 +761,10 @@ function Rails() {
 
 
 function Rock() {
-    const rock = new THREE.Group();
+    rock = new THREE.Group();
 
 
-    const trunk = new THREE.Mesh(
+    trunk = new THREE.Mesh(
         new THREE.BoxBufferGeometry(5 * zoom, 5 * zoom, 5 * zoom),
         new THREE.MeshPhongMaterial({ color: colors.metal, flatShading: true }));
 
@@ -755,7 +772,7 @@ function Rock() {
     trunk.castShadow = true;
     trunk.receiveShadow = true;
 
-    const trunk2 = new THREE.Mesh(
+    trunk2 = new THREE.Mesh(
         new THREE.BoxBufferGeometry(5 * zoom, 5 * zoom, 5 * zoom),
         new THREE.MeshPhongMaterial({ color: colors.metal, flatShading: true }));
 
@@ -768,7 +785,7 @@ function Rock() {
     height = (positionWidth / 2 + Math.floor(Math.random() * 20)) / 3 * zoom;
     this.adefault_position = height;
     // console.log("rock height", height);
-    const main = new THREE.Mesh(
+    main = new THREE.Mesh(
         new THREE.BoxBufferGeometry(positionWidth * zoom, positionWidth * zoom, height * zoom),
         new THREE.MeshPhongMaterial({ color: colors.rock, flatShading: true }));
 
@@ -779,7 +796,7 @@ function Rock() {
     main.receiveShadow = true;
     rock.add(main);
 
-    // const rock_1 = new THREE.Mesh(
+    // rock_1 = new THREE.Mesh(
     //     new THREE.BoxBufferGeometry(15 * zoom, 15 * zoom, 15 * zoom),
     //     new THREE.MeshPhongMaterial({ color: colors.rock, flatShading: true }));
 
@@ -796,10 +813,10 @@ function Rock() {
 }
 
 function Metal() {
-    const rock = new THREE.Group();
+    rock = new THREE.Group();
 
 
-    const trunk = new THREE.Mesh(
+    trunk = new THREE.Mesh(
         new THREE.BoxBufferGeometry(5 * zoom, 5 * zoom, 5 * zoom),
         new THREE.MeshPhongMaterial({ color: 0x4d2926, flatShading: true }));
 
@@ -807,7 +824,7 @@ function Metal() {
     trunk.castShadow = true;
     trunk.receiveShadow = true;
 
-    const trunk2 = new THREE.Mesh(
+    trunk2 = new THREE.Mesh(
         new THREE.BoxBufferGeometry(5 * zoom, 5 * zoom, 5 * zoom),
         new THREE.MeshPhongMaterial({ color: 0x4d2926, flatShading: true }));
 
@@ -820,7 +837,7 @@ function Metal() {
     height = (positionWidth / 2 + Math.floor(Math.random() * 20)) / 2 * zoom;
     this.adefault_position = height;
     // console.log("rock height", height);
-    const main = new THREE.Mesh(
+    main = new THREE.Mesh(
         new THREE.BoxBufferGeometry(positionWidth * zoom, positionWidth * zoom, height * zoom),
         new THREE.MeshPhongMaterial({ color: colors.metal, flatShading: true }));
 
@@ -835,9 +852,9 @@ function Metal() {
 }
 
 function Arbre() {
-    const arbre = new THREE.Group();
+    arbre = new THREE.Group();
 
-    const trunk = new THREE.Mesh(
+    trunk = new THREE.Mesh(
         new THREE.BoxBufferGeometry(5 * zoom, 5 * zoom, 5 * zoom),
         new THREE.MeshPhongMaterial({ color: colors.bois, flatShading: true }));
 
@@ -845,7 +862,7 @@ function Arbre() {
     trunk.castShadow = true;
     trunk.receiveShadow = true;
 
-    const trunk2 = new THREE.Mesh(
+    trunk2 = new THREE.Mesh(
         new THREE.BoxBufferGeometry(5 * zoom, 5 * zoom, 5 * zoom),
         new THREE.MeshPhongMaterial({ color: colors.bois, flatShading: true }));
 
@@ -856,11 +873,11 @@ function Arbre() {
     arbre.add(trunk2);
 
 
-    const body = new THREE.Group();
+    body = new THREE.Group();
     let rotation = Math.floor(Math.random() * 180) + 1;
     body.rotation.z = rotation * Math.PI / 180;
     // Petit cube
-    const cube1 = new THREE.Mesh(
+    cube1 = new THREE.Mesh(
         new THREE.BoxBufferGeometry(9 * zoom, 9 * zoom, 9 * zoom),
         new THREE.MeshLambertMaterial({ color: 0x9cff00, flatShading: true }));
 
@@ -872,7 +889,7 @@ function Arbre() {
     body.add(cube1);
 
     // Grand cube
-    const cube2 = new THREE.Mesh(
+    cube2 = new THREE.Mesh(
         new THREE.BoxBufferGeometry(11 * zoom, 11 * zoom, 11 * zoom),
         new THREE.MeshLambertMaterial({ color: 0x9cff00, flatShading: true }));
 
@@ -887,9 +904,9 @@ function Arbre() {
     return arbre;
 }
 function Sapin() {
-    const arbre = new THREE.Group();
+    arbre = new THREE.Group();
 
-    const trunk = new THREE.Mesh(
+    trunk = new THREE.Mesh(
         new THREE.BoxBufferGeometry(5 * zoom, 5 * zoom, 5 * zoom),
         new THREE.MeshPhongMaterial({ color: colors.bois, flatShading: true }));
 
@@ -897,7 +914,7 @@ function Sapin() {
     trunk.castShadow = true;
     trunk.receiveShadow = true;
 
-    const trunk2 = new THREE.Mesh(
+    trunk2 = new THREE.Mesh(
         new THREE.BoxBufferGeometry(5 * zoom, 5 * zoom, 5 * zoom),
         new THREE.MeshPhongMaterial({ color: colors.bois, flatShading: true }));
 
@@ -908,11 +925,11 @@ function Sapin() {
     arbre.add(trunk2);
 
 
-    const body = new THREE.Group();
+    body = new THREE.Group();
     let rotation = Math.floor(Math.random() * 180) + 1;
     body.rotation.z = rotation * Math.PI / 180;
     // Petit cube
-    const cube1 = new THREE.Mesh(
+    cube1 = new THREE.Mesh(
         new THREE.BoxBufferGeometry(6 * zoom, 6 * zoom, 6 * zoom),
         new THREE.MeshLambertMaterial({ color: 0x45be6f, flatShading: true }));
 
@@ -922,7 +939,7 @@ function Sapin() {
     body.add(cube1);
 
     // Grand cube
-    const cube2 = new THREE.Mesh(
+    cube2 = new THREE.Mesh(
         new THREE.BoxBufferGeometry(11 * zoom, 11 * zoom, 6 * zoom),
         new THREE.MeshLambertMaterial({ color: 0x45be6f, flatShading: true }));
 
@@ -936,14 +953,14 @@ function Sapin() {
 }
 
 function Station() {
-    const station = new THREE.Group();
-    const stationBackTexture = new Texture('#000', positionWidth * zoom * 2, positionWidth * zoom * 6, [
+    station = new THREE.Group();
+    stationBackTexture = new Texture('#000', positionWidth * zoom * 2, positionWidth * zoom * 6, [
         { x: 30, y: 10, w: 60, h: 60 },
         { x: 20, y: 80, w: 60, h: 80 },
         { x: 30, y: 170, w: 60, h: 60 }
     ]);
 
-    const center = new THREE.Mesh(
+    center = new THREE.Mesh(
         new THREE.BoxBufferGeometry(positionWidth * zoom, positionWidth * 3 * zoom, positionWidth * 1.5 * zoom),
         [
             new THREE.MeshPhongMaterial({ color: 0x705341, flatShading: true, map: stationBackTexture }),
@@ -956,7 +973,7 @@ function Station() {
     center.position.z = positionWidth * 1.5 / 2 * zoom;
     center.castShadow = true;
     center.receiveShadow = true;
-    const plafond = new THREE.Mesh(
+    plafond = new THREE.Mesh(
         new THREE.BoxBufferGeometry((positionWidth - 4) * zoom, (positionWidth * 3 - 4) * zoom, 4 * zoom),
         new THREE.MeshPhongMaterial({ color: 0x5acaa4, flatShading: true }));
 
@@ -964,7 +981,7 @@ function Station() {
     plafond.castShadow = true;
     plafond.receiveShadow = true;
 
-    const grenier = new THREE.Mesh(
+    grenier = new THREE.Mesh(
         new THREE.BoxBufferGeometry((positionWidth - 4) * zoom, positionWidth * zoom, positionWidth * zoom),
         new THREE.MeshPhongMaterial({ color: 0x705341, flatShading: true })
     );
@@ -973,7 +990,7 @@ function Station() {
     grenier.castShadow = true;
     grenier.receiveShadow = true;
 
-    const gplafond = new THREE.Mesh(
+    gplafond = new THREE.Mesh(
         new THREE.BoxBufferGeometry((positionWidth - 4) * zoom, (positionWidth - 4) * zoom, 4 * zoom),
         new THREE.MeshPhongMaterial({ color: 0x5acaa4, flatShading: true }));
 
@@ -1012,7 +1029,7 @@ function Cell(data) {
     if (type == 'w' || type == 'x') // Water
         color = 0x00ffe0;
 
-    const cellg = new THREE.Group();
+    cellg = new THREE.Group();
 
     cell = new THREE.Mesh(
         new THREE.BoxBufferGeometry(positionWidth * zoom, positionWidth * zoom, height * zoom),
@@ -1065,7 +1082,7 @@ function Cell(data) {
             if (addon2)
                 nb = addon2;
             for (let i = 0; i < nb; i++) {
-                console.log("addon", addon);
+                // console.log("addon", addon);
                 let addon_type = addon == 'b' ? 'bois' : 'metal';
                 let sb = new Stock(addon_type);
                 // sb.position.x = 0;
@@ -1104,7 +1121,7 @@ function Cell(data) {
 
 function TrainCountdown(countdown = 5) {
 
-    const distance = new THREE.Group();
+    let distance = new THREE.Group();
 
 
     var loader = new THREE.FontLoader();
@@ -1143,7 +1160,7 @@ function TrainCountdown(countdown = 5) {
 
 function Distance(index) {
 
-    const distance = new THREE.Group();
+    let distance = new THREE.Group();
 
 
     var loader = new THREE.FontLoader();
