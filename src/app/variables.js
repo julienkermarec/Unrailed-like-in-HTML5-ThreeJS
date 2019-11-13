@@ -145,7 +145,14 @@ generateWagonRails = () => {
     wrail = new Wagon('rail');
     wrail.position.x = (9 * positionWidth) * zoom;
     wrail.position.y = 2.1 * positionWidth * zoom;
-
+    for (let i = 0; i < 3; i++) {
+        let new_rail = new Rails();
+        if (i % 2 !== 0)
+            new_rail.rotation.z = Math.PI / 2;
+        new_rail.position.z = 25 + i * 7;
+        new_rail.visible = false;
+        wrail.add(new_rail);
+    }
     return wrail;
 }
 

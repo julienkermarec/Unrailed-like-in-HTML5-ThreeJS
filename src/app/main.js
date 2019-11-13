@@ -142,7 +142,24 @@ window.addEventListener("keydown", event => {
         move('forward');
     }
 });
+function makeRails() {
 
+    console.log('make rails counter', counter);
+    setTimeout(() => {
+        console.log('make rails timeout', counter);
+        if (!(counter['b'] >= 1 && counter['p'] >= 1 && counter['r'] < 3))
+            return;
+
+        counter['b']--;
+        counter['p']--;
+        counter['r']++;
+        wstock.children[1].children[counter['b']].visible = false;
+        wstock.children[2].children[counter['p']].visible = false;
+        wrails.children[counter['r']].visible = true;
+        makeRails();
+    }, 2500);
+
+}
 function pick() {
     console.log("pick", levels[level_id][currentColumn][currentLane]);
 
@@ -150,11 +167,18 @@ function pick() {
         return;
     pick_item = levels[level_id][currentColumn][currentLane][1];
     pick_item_nb = parseInt(levels[level_id][currentColumn][currentLane][2]);
+    console.log("pick_item_nb before before ", pick_item_nb);
+    if (typeof levels[level_id][currentColumn][currentLane][3] !== "undefined")
+        pick_item_nb = parseInt(pick_item_nb + levels[level_id][currentColumn][currentLane][3]);
+
+    console.log("levels[level_id][currentColumn][currentLane][3]", typeof levels[level_id][currentColumn][currentLane][3] == "undefined");
+    console.log("pick_item_nb before ", pick_item_nb);
     if (!(pick_item_nb >= 0))
         pick_item_nb = ' ';
     type_color = (pick_item == 'b' ? colors.bois : colors.metal);
     cell = getCell();
-    drop_cell = levels[level_id][cell.column] && levels[level_id][cell.column] ? levels[level_id][cell.column][cell.lane] : null;
+    drop_cell_next = levels[level_id][cell.column] && levels[level_id][cell.column] ? levels[level_id][cell.column][cell.lane] : null;
+    drop_cell = levels[level_id][currentColumn][currentLane];
     update_player = false;
     console.log("cell", cell)
     console.log("player pick", player_pick)
@@ -163,13 +187,25 @@ function pick() {
     console.log("pick cell", levels[level_id][currentColumn][currentLane]);
     console.log("pick item", pick_item);
     console.log("pick_item_nb", pick_item_nb);
+    console.log("drop_cell_next", drop_cell_next);
     console.log("drop_cell", drop_cell);
 
     need_to_drop = [];
     picked = false;
 
+    // Si pick == wagon rails
+    if (drop_cell_next != null && drop_cell_next[2] == 'r' && player_pick.length == 0 && counter.r > 0) {
+        console.log("pick == wagon rails");
+        for (let i = counter.r; i > 0; i--) {
+            console.log("children i", i)
+            player_pick.push('r');
+            wrails.children[i].visible = false;
+        }
+        update_player = true;
+        picked = true;
+    }
     // Si pick == axe ou pickaxe ou waterbucket
-    if (pick_item == 'h' || pick_item == 'a' || pick_item == 'w') {
+    else if (pick_item == 'h' || pick_item == 'a' || pick_item == 'w') {
         console.log("pick == axe ou pickaxe ou waterbucket");
         need_to_drop = player_pick;
         lanes[currentLane].mesh.children[currentColumn].children.pop();
@@ -183,19 +219,30 @@ function pick() {
         // Disable pick if max length but enable pick & drop
         if (player_pick.length >= 3) {
             console.warn("cant pick more");
+
+            type_color = player_pick[0] == 'b' ? colors.bois : colors.metal;
             picked = false;
             need_to_drop = player_pick;
         }
         else {
             console.warn("picked true");
             picked = true;
-            need_to_drop = player_pick;
+            if (player_pick[0] == "a" || player_pick[0] == "h" || player_pick[0] == "w") {
+                if (pick_item_nb > 3)
+                    return;
+                need_to_drop = player_pick[0];
+                player_pick = [];
+
+            }
             if (pick_item_nb <= 3) {
                 levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, " ");
                 levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(2, " ");
-            } else
-                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(2, (pick_item_nb - 3).toString());
-
+            } else {
+                new_count = (pick_item_nb - 3);
+                console.log("new_count pick", new_count)
+                new_count = new_count == 1 ? " " : new_count.toString();
+                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(2, new_count);
+            }
             // player_pick = [pick_item];
             // lanes[currentLane].mesh.children[currentColumn].children.pop();
             for (let i = 0; i <= pick_item_nb && i < 3; i++) {
@@ -221,7 +268,7 @@ function pick() {
         update_player = true;
     }
     // Si drop == wagon stock
-    else if (drop_cell != null && drop_cell[2] == 's' && player_pick.length > 0) {
+    else if (drop_cell_next != null && drop_cell_next[2] == 's' && player_pick.length > 0 && (player_pick[0] == 'b' || player_pick[0] == 'p')) {
         console.log("drop == wagon stock");
         if (player_pick[0] == 'b') {
             index = 1;
@@ -248,16 +295,26 @@ function pick() {
             }
             update_player = true;
             updateCounter();
+            console.log("counter after", JSON.parse(JSON.stringify(counter)));
+            makeRails();
         }
-        update_player = true;
-        console.log("counter after", JSON.parse(JSON.stringify(counter)));
         // train.children[1].children[5].visible = true;
     }
     // Si drop == wagon rails
-    else if (drop_cell != null && drop_cell[2] == 'r' && player_pick.length == 0 && stock.rails > 0) {
+    else if (!picked && drop_cell != null && pick_item == " " && player_pick.length > 0 && player_pick[0] == 'r') {
         console.log("drop == wagon rails");
-        player_pick = ['r', 'r', 'r'];
+        player_pick.pop();
+        lanes[currentLane].mesh.children[currentColumn].add(new Rails());
+        levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, 'l');
         update_player = true;
+    }
+    // Si drop == wagon water
+    else if (drop_cell != null && drop_cell_next != null && drop_cell_next[2] == 'w' && player_pick.length > 0 && player_pick[0] == 'w') {
+        console.log("drop == wagon water");
+        // player_pick.pop();
+        // lanes[currentLane].mesh.children[currentColumn].add(new Rails());
+        // levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, 'l');
+        // update_player = true;
     }
     // Si drop == water bucket
     else if (drop_cell != null && ((pick_item == " " && player_pick.length > 0 && player_pick[0] == 'w') || need_to_drop[0] == "w")) {
@@ -287,7 +344,7 @@ function pick() {
             player_pick = [];
     }
     // Si drop == bois ou pierre sur g / o / b
-    else if (!picked && drop_cell != null && drop_cell[1] == " " && player_pick.length > 0 && (player_pick[0] == "b" || player_pick[0] == "p")) {
+    else if (!picked && drop_cell != null && player_pick.length > 0 && (player_pick[0] == "b" || player_pick[0] == "p")) {
         console.log("drop == bois sur g / o / b", player_pick);
         //verification type different
         if (player_pick.length > 0 && player_pick[0] != levels[level_id][currentColumn][currentLane][1] && levels[level_id][currentColumn][currentLane][1] != " ") {
@@ -296,10 +353,14 @@ function pick() {
         }
         else {
             levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, player_pick[0]);
-            start_at = pick_item_nb > 0 ? pick_item_nb : 0;
-            if (player_pick.length > 1)
-                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(2, (start_at + player_pick.length).toString());
-
+            start_at = pick_item_nb > 0 ? pick_item_nb : drop_cell[1] == ' ' ? 0 : 1;
+            console.log("drop start_at", start_at);
+            if (player_pick.length > 1) {
+                new_count = start_at + player_pick.length;
+                new_count = new_count == 1 ? " " : new_count.toString();
+                console.log("new_count drop", new_count)
+                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(2, new_count);
+            }
             for (let i = start_at; i < (player_pick.length + start_at); i++) {
                 if (player_pick[0] == 'b')
                     sb = new Stock('bois');
@@ -353,6 +414,10 @@ function pick() {
                     player.children[2].children[6].material.color.setHex(type_color);
                     player.children[2].children[7].material.color.setHex(type_color);
                 }
+                // Remove player water bucket / axe / hache
+                player.children[2].children[11].visible = false;
+                player.children[2].children[12].visible = false;
+                player.children[2].children[13].visible = false;
             }
             else if (player_pick[0] == 'r') {
                 player.children[2].children[8].visible = true;

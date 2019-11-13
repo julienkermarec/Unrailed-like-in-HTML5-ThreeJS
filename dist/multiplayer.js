@@ -1,1 +1,71 @@
-!function(e){var n={};function t(o){if(n[o])return n[o].exports;var l=n[o]={i:o,l:!1,exports:{}};return e[o].call(l.exports,l,l.exports,t),l.l=!0,l.exports}t.m=e,t.c=n,t.d=function(e,n,o){t.o(e,n)||Object.defineProperty(e,n,{enumerable:!0,get:o})},t.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},t.t=function(e,n){if(1&n&&(e=t(e)),8&n)return e;if(4&n&&"object"==typeof e&&e&&e.__esModule)return e;var o=Object.create(null);if(t.r(o),Object.defineProperty(o,"default",{enumerable:!0,value:e}),2&n&&"string"!=typeof e)for(var l in e)t.d(o,l,function(n){return e[n]}.bind(null,l));return o},t.n=function(e){var n=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(n,"a",n),n},t.o=function(e,n){return Object.prototype.hasOwnProperty.call(e,n)},t.p="",t(t.s=4)}({4:function(e,n){var t=document.getElementById("chat-output"),o=document.getElementById("chat-input"),l=document.getElementById("setup-datachannel"),i=document.getElementById("start-solo"),r=document.getElementById("menu_principal"),a=document.getElementById("menu_multi"),s=document.getElementById("cancel-datachannel"),c=document.getElementById("menu");let u;o.onkeypress=function(e){13==e.keyCode&&(u.send({type:"message",message:this.value}),t.innerHTML+="<li>Moi: "+this.value+"</li>",this.value="")},i.onclick=function(){c.style.display="none",start()},s.onclick=function(){console.log("cancel",u),r.style.display="block",a.style.display="none",delete u},l.onclick=function(){console.log("startButton"),r.style.display="none",a.style.display="block",(u=new DataChannel("unrailed")).onopen=function(e){console.log("on open",e),o.style.display="block",l.style.display="none",t.innerHTML+="<li>Connecté avec "+e+"</li>",addPlayer(e),c.style.display="none",start()},u.onmessage=(e,n)=>{console.log("on message",n),"message"==e.type?t.innerHTML+="<li>"+n+": "+e.message+"</li>":"move"==e.type&&(startMoving=!0,move(e.direction,n))},u.onleave=e=>{t.innerHTML+="<li>"+e+" Left.</li>",o.style.display="none",r.style.display="block",a.style.display="none"}}}});
+
+var chatOutput = document.getElementById('chat-output');
+var chatInput = document.getElementById('chat-input');
+var startButton = document.getElementById('setup-datachannel');
+var startSoloButton = document.getElementById('start-solo');
+var menu_principal = document.getElementById('menu_principal');
+var menu_multi = document.getElementById('menu_multi');
+var cancelDatachannel = document.getElementById('cancel-datachannel');
+var menu = document.getElementById('menu');
+let channel;
+chatInput.onkeypress = function (e) {
+    if (e.keyCode != 13) return;
+    channel.send({ 'type': 'message', 'message': this.value });
+    chatOutput.innerHTML += '<li>Moi: ' + this.value + '</li>';
+    this.value = '';
+};
+startSoloButton.onclick = function () {
+    menu.style.display = 'none';
+    start();
+}
+cancelDatachannel.onclick = function () {
+    console.log("cancel", channel);
+    menu_principal.style.display = 'block';
+    menu_multi.style.display = 'none';
+    delete channel;
+}
+
+startButton.onclick = function () {
+    // setup new data channel
+    console.log("startButton");
+    menu_principal.style.display = 'none';
+    menu_multi.style.display = 'block';
+
+
+    channel = new DataChannel('unrailed');
+
+    channel.onopen = function (userid) {
+        console.log("on open", userid);
+        chatInput.style.display = 'block';
+        startButton.style.display = 'none';
+        chatOutput.innerHTML += '<li>Connecté avec ' + userid + '</li>';
+
+        addPlayer(userid)
+        menu.style.display = 'none';
+        start();
+    };
+
+    channel.onmessage = (data, userid) => {
+        console.log("on message", userid);
+        if (data.type == 'message')
+            chatOutput.innerHTML += '<li>' + userid + ': ' + data.message + '</li>';
+        else if (data.type == 'move') {
+            startMoving = true;
+            move(data.direction, userid);
+        }
+    };
+
+    channel.onleave = (userid) => {
+        chatOutput.innerHTML += '<li>' + userid + ' Left.</li>';
+
+        chatInput.style.display = 'none';
+        menu_principal.style.display = 'block';
+        menu_multi.style.display = 'none';
+    };
+
+    // search for existing data channels
+
+    // channel.open();
+    // channel.connect();
+
+};

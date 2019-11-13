@@ -1,1 +1,959 @@
-!function(e){var l={};function n(i){if(l[i])return l[i].exports;var r=l[i]={i:i,l:!1,exports:{}};return e[i].call(r.exports,r,r.exports,n),r.l=!0,r.exports}n.m=e,n.c=l,n.d=function(e,l,i){n.o(e,l)||Object.defineProperty(e,l,{enumerable:!0,get:i})},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=function(e,l){if(1&l&&(e=n(e)),8&l)return e;if(4&l&&"object"==typeof e&&e&&e.__esModule)return e;var i=Object.create(null);if(n.r(i),Object.defineProperty(i,"default",{enumerable:!0,value:e}),2&l&&"string"!=typeof e)for(var r in e)n.d(i,r,function(l){return e[l]}.bind(null,r));return i},n.n=function(e){var l=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(l,"a",l),l},n.o=function(e,l){return Object.prototype.hasOwnProperty.call(e,l)},n.p="",n(n.s=3)}({3:function(e,l){function n(){water_bucket_position=[11,2],hache_position=[11,3],axe_position=[11,4],train_position=[9,9],train_length=7,train_counter=0,train_countdown=1e3,currentLane=7,currentColumn=12,currentLane=3,currentColumn=8,level_id=0,stock={rails:0,pierre:0,bois:0},level_distance=levels[level_id][0].length,player_pick=[],previousTimestamp=null,startMoving=!1,moves=[],directions=[],moves_players=[],player=new Player(currentLane,currentColumn),player.position.x=currentColumn*positionWidth*zoom,player.position.y=currentLane*positionWidth*zoom,scene.add(player),camera.position.y=initialCameraPositionY,camera.position.x=initialCameraPositionX,dirLight.position.x=initialDirLightPositionX,dirLight.position.y=initialDirLightPositionY,lanes=generateLanes(),train=generateTrain(),wwater=generateWagonWater(),wstock=generateWagonStock(),wrails=generateWagonRails(),train_smoke=new Smoke,wwater_smoke=new Smoke,train_smoke_default=new Smoke,train.add(train_smoke),scene.add(train),wwater_smoke.position.y=-20,wwater_smoke.visible=!1,wwater.add(wwater_smoke),scene.add(wwater),scene.add(wstock),scene.add(wrails),menu.style.display="none",started=!0,console.log("start")}function i(){return"forward"===direction?{lane:currentLane+1,column:currentColumn}:"backward"===direction?{lane:currentLane-1,column:currentColumn}:"left"===direction?{lane:currentLane,column:currentColumn-1}:"right"===direction?{lane:currentLane,column:currentColumn+1}:void 0}function r(){if(started&&(nextCell=i(),!(nextCell.column<0||nextCell.column>=columns||nextCell.lane<0)))return console.log("action nextCell",nextCell),console.log("action direction",direction),console.log("action",levels[level_id][nextCell.column][nextCell.lane]),"t"==levels[level_id][nextCell.column][nextCell.lane][1]&&"h"==player_pick[0]?function(e,l){if(console.log("cutForest currentColumn",currentColumn,e),console.log("cutForest currentLane",currentLane,l),!started)return;console.log("lanes[lane].mesh.children[column].children[1].position.z ",lanes[l].mesh.children[e].children[1].position.z),console.log("levels[level_id][column][lane]",levels[level_id][e][l]),lanes[l].mesh.children[e].children[1].position.z>-34?(lanes[l].mesh.children[e].children[1].position.z-=7,t()):(lanes[l].mesh.children[e].children[1].position.z=-40,levels[level_id][e][l]=levels[level_id][e][l][0]+"b",lanes[l].mesh.children[e].children[1].children[0].position.z=42,lanes[l].mesh.children[e].children[1].children[0].position.y=4,lanes[l].mesh.children[e].children[1].children[0].scale.x=2.5,lanes[l].mesh.children[e].children[1].children[0].scale.z=.3,lanes[l].mesh.children[e].children[1].children[1].position.z=42,lanes[l].mesh.children[e].children[1].children[1].position.y=-9,lanes[l].mesh.children[e].children[1].children[1].scale.x=2.5,lanes[l].mesh.children[e].children[1].children[1].scale.z=.3,lanes[l].mesh.children[e].children[1].children[2].scale.z=.1,lanes[l].mesh.children[e].children[1].children[2].scale.x=.1,lanes[l].mesh.children[e].children[1].children[2].scale.y=.1);return}(nextCell.column,nextCell.lane):"r"==levels[level_id][nextCell.column][nextCell.lane][1]&&"a"==player_pick[0]?function(e,l){if(console.log("cutForest currentColumn",currentColumn,e),console.log("cutForest currentLane",currentLane,l),!started)return;console.log("lanes[lane].mesh.children[column].children[1].position.z ",lanes[l].mesh.children[e].children[1].position.z),console.log("levels[level_id][column][lane]",levels[level_id][e][l]),lanes[l].mesh.children[e].children[1].position.z>-34?(lanes[l].mesh.children[e].children[1].position.z-=7,t()):(lanes[l].mesh.children[e].children[1].position.z=-40,levels[level_id][e][l]=levels[level_id][e][l][0]+"p",lanes[l].mesh.children[e].children[1].children[0].position.z=42,lanes[l].mesh.children[e].children[1].children[0].position.y=4,lanes[l].mesh.children[e].children[1].children[0].scale.x=2.5,lanes[l].mesh.children[e].children[1].children[0].scale.z=.3,lanes[l].mesh.children[e].children[1].children[1].position.z=42,lanes[l].mesh.children[e].children[1].children[1].position.y=-9,lanes[l].mesh.children[e].children[1].children[1].scale.x=2.5,lanes[l].mesh.children[e].children[1].children[1].scale.z=.3,lanes[l].mesh.children[e].children[1].children[2].scale.z=.1,lanes[l].mesh.children[e].children[1].children[2].scale.x=.1,lanes[l].mesh.children[e].children[1].children[2].scale.y=.1);return}(nextCell.column,nextCell.lane):void 0}function t(){statsRocksDOM.innerHTML=counter.p,statsWoodsDOM.innerHTML=counter.b,counterDOM.innerHTML=counter.r}function o(e){r(),directions.push(e)}function a(e,l=null){if(direction=e,channel){if(null!=l)return moves_players.push({userId:l,direction:direction});channel.send({type:"move",direction:direction})}if(finalPositions=moves.reduce((e,l)=>"forward"===l?{lane:e.lane+1,column:e.column}:"backward"===l?{lane:e.lane-1,column:e.column}:"left"===l?{lane:e.lane,column:e.column-1}:"right"===l?{lane:e.lane,column:e.column+1}:void 0,{lane:currentLane,column:currentColumn}),can_walk_ground=["e","w"],can_walk_addon=["t","r","m","s","d"],can_walk_train=["r","s","t","w"],"forward"===direction){if(finalPositions.lane+1>=level_distance)return o("forward");if(-1!==can_walk_ground.indexOf(levels[level_id][finalPositions.column][finalPositions.lane+1][0]))return o("forward");if(-1!==can_walk_addon.indexOf(levels[level_id][finalPositions.column][finalPositions.lane+1][1]))return o("forward");if(-1!==can_walk_train.indexOf(levels[level_id][finalPositions.column][finalPositions.lane+1][2]))return o("forward");stepStartTimestamp||(startMoving=!0),addLane()}else if("backward"===direction){if(finalPositions.lane<=0)return o("backward");if(console.log("next cell",levels[level_id][finalPositions.column][finalPositions.lane-1]),-1!==can_walk_ground.indexOf(levels[level_id][finalPositions.column][finalPositions.lane-1][0]))return o("backward");if(-1!==can_walk_addon.indexOf(levels[level_id][finalPositions.column][finalPositions.lane-1][1]))return o("backward");if(-1!==can_walk_train.indexOf(levels[level_id][finalPositions.column][finalPositions.lane-1][2]))return o("backward");stepStartTimestamp||(startMoving=!0)}else if("left"===direction){if(0===finalPositions.column)return;if(finalPositions.lane<0)stepStartTimestamp||(startMoving=!0);else{if(console.log("next cell",levels[level_id][finalPositions.column-1][finalPositions.lane]),-1!==can_walk_ground.indexOf(levels[level_id][finalPositions.column-1][finalPositions.lane][0]))return o("left");if(-1!==can_walk_addon.indexOf(levels[level_id][finalPositions.column-1][finalPositions.lane][1]))return o("left");if(-1!==can_walk_train.indexOf(levels[level_id][finalPositions.column-1][finalPositions.lane][2]))return o("left");stepStartTimestamp||(startMoving=!0)}}else if("right"===direction){if(finalPositions.column===columns-1)return;if(finalPositions.lane<0)stepStartTimestamp||(startMoving=!0);else{if(console.log("next cell",levels[level_id][finalPositions.column+1][finalPositions.lane]),-1!==can_walk_ground.indexOf(levels[level_id][finalPositions.column+1][finalPositions.lane][0]))return o("right");if(-1!==can_walk_addon.indexOf(levels[level_id][finalPositions.column+1][finalPositions.lane][1]))return o("right");if(-1!==can_walk_train.indexOf(levels[level_id][finalPositions.column+1][finalPositions.lane][2]))return o("right");stepStartTimestamp||(startMoving=!0)}}null==l&&moves.push(direction)}function c(e){if(requestAnimationFrame(c),previousTimestamp||(previousTimestamp=e),delta=e-previousTimestamp,previousTimestamp=e,dirLight.position.x=initialDirLightPositionX,started&&train_countdown<=-1){if(train_counter>=positionWidth*zoom){for(let e=train_position[1]-train_length;e<=train_position[1];e++)j=train_position[1]-e,j<=1?levels[level_id][train_position[0]][e]="glt":j<=2?levels[level_id][train_position[0]][e]="glw":j<=4?levels[level_id][train_position[0]][e]="gls":j<=6?levels[level_id][train_position[0]][e]="glr":7==j&&(levels[level_id][train_position[0]][e]="gl");y=train_position[1],y++,train_position=[train_position[0],y],train_counter=0}train_counter+=.01*delta,train.position.y+=.01*delta,wwater.position.y+=.01*delta,wstock.position.y+=.01*delta,wrails.position.y+=.01*delta,wwater.children[0].children[0].scale.z>0?wwater.children[0].children[0].scale.z-=2e-4:(train_smoke.children[0].material.color.setHex(colors.red),wwater_smoke.children[0].material.color.setHex(colors.red),wwater_smoke.visible=!0,1==wwater.children[0].children[0].visible&&(wwater.children[0].children[0].visible=!1,train_smoke.children[0].material.opacity=.99));let e=3e3;0==wwater.children[0].children[0].visible&&(e=9e3),train_smoke.position.z+=.002*delta,train_smoke.position.y-=.01*delta,train_smoke.scale.x+=25e-5*delta,train_smoke.scale.y+=25e-5*delta,train_smoke.scale.z+=25e-5*delta,train_smoke.children[0].material.opacity-=1/e*delta,0==wwater.children[0].children[0].visible&&(wwater_smoke.position.z+=.002*delta,wwater_smoke.position.y-=.01*delta,wwater_smoke.scale.x+=25e-5*delta,wwater_smoke.scale.y+=25e-5*delta,wwater_smoke.scale.z+=25e-5*delta,wwater_smoke.children[0].material.opacity-=1/e*delta),train_smoke.children[0].material.opacity<0&&(train_smoke.children[0].material.opacity=.99,train_smoke.position.z=train_smoke_default.position.z,train_smoke.scale.z=train_smoke_default.scale.z,train_smoke.scale.y=train_smoke_default.scale.y,train_smoke.scale.x=train_smoke_default.scale.x,train_smoke.position.y=train_smoke_default.position.y,0==wwater.children[0].children[0].visible&&(wwater_smoke.children[0].material.opacity=.99,wwater_smoke.position.z=train_smoke_default.position.z,wwater_smoke.scale.z=train_smoke_default.scale.z,wwater_smoke.scale.y=train_smoke_default.scale.y,wwater_smoke.scale.x=train_smoke_default.scale.x,wwater_smoke.position.y=-20)),camera.position.y+=.01*delta}else train_countdown>-1&&(train_countdown-=1,Number.isInteger(train_countdown/100)&&(train_countdown/100>0?(train.children[train_countdown/100+1].visible=!0,train_countdown/100<10&&(train.children[train_countdown/100+2].visible=!1)):(train.children[train_countdown/100+1].visible=!1,train.children[train_countdown/100+2].visible=!1)));if(startMoving&&(stepStartTimestamp=e,startMoving=!1),stepStartTimestamp){switch(moveDeltaTime=e-stepStartTimestamp,moveDeltaDistance=Math.min(moveDeltaTime/stepTime,1)*positionWidth*zoom,jumpDeltaDistance=8*Math.sin(Math.min(moveDeltaTime/stepTime,1)*Math.PI)*zoom,moves[0]){case"forward":positionY=currentLane*positionWidth*zoom+moveDeltaDistance,player.position.y=positionY,player.position.z=jumpDeltaDistance,player.rotation.z=Math.PI/2;break;case"backward":positionY=currentLane*positionWidth*zoom-moveDeltaDistance,player.position.y=positionY,player.position.z=jumpDeltaDistance,player.rotation.z=-Math.PI/2;break;case"left":positionX=currentColumn*positionWidth*zoom-moveDeltaDistance,player.position.x=positionX,player.position.z=jumpDeltaDistance,player.rotation.z=Math.PI;break;case"right":positionX=currentColumn*positionWidth*zoom+moveDeltaDistance,player.position.x=positionX,player.position.z=jumpDeltaDistance,player.rotation.z=0}let l=moves_players[0];if(null!=l){switch(l.direction){case"forward":players[l.userId].position.y+=positionWidth*zoom+moveDeltaDistance,players[l.userId].position.z=jumpDeltaDistance;break;case"backward":players[l.userId].position.y-=positionWidth*zoom+moveDeltaDistance,players[l.userId].position.z=jumpDeltaDistance;break;case"left":players[l.userId].position.x-=positionWidth*zoom+moveDeltaDistance,players[l.userId].position.z=jumpDeltaDistance;break;case"right":players[l.userId].position.x+=positionWidth*zoom+moveDeltaDistance,players[l.userId].position.z=jumpDeltaDistance}moves_players.shift()}if(moveDeltaTime>stepTime){switch(moves[0]){case"forward":currentLane++;break;case"backward":currentLane--;break;case"left":currentColumn--;break;case"right":currentColumn++}moves.shift(),stepStartTimestamp=0===moves.length?null:e}}else if(null!=directions[0]){switch(console.log("directions[0]",directions[0]),directions[0]){case"forward":player.rotation.z=Math.PI/2;break;case"backward":player.rotation.z=-Math.PI/2;break;case"left":player.rotation.z=Math.PI;break;case"right":player.rotation.z=0}directions.shift()}renderer.render(scene,camera),stats.update()}renderer=new THREE.WebGLRenderer({alpha:!0,antialias:!0}),String.prototype.replaceAt=function(e,l){return this.substr(0,e)+l+this.substr(e+l.length)},renderer.shadowMap.enabled=!0,renderer.shadowMap.type=THREE.PCFSoftShadowMap,renderer.setSize(window.innerWidth,window.innerHeight),document.body.appendChild(renderer.domElement),document.addEventListener("DOMContentLoaded",(function(){document.body.style.zoom=window.innerWidth/window.outerWidth,document.body.style.webkitTransform="scale(1)",document.body.style.msTransform="scale(1)",document.body.style.transform="scale(1)"})),document.querySelector("#retry").addEventListener("click",()=>{lanes.forEach(e=>scene.remove(e.mesh)),n(),endDOM.style.visibility="hidden"}),document.addEventListener("mousewheel",e=>{console.log("mousewheel",e),e.deltaY>0?camera.zoom-=.01:camera.zoom+=.01,camera.updateProjectionMatrix()},!1),document.getElementById("forward").addEventListener("click",()=>a("left")),document.getElementById("backward").addEventListener("click",()=>a("right")),document.getElementById("left").addEventListener("click",()=>a("backward")),document.getElementById("right").addEventListener("click",()=>a("forward")),window.addEventListener("keydown",e=>{"32"==e.keyCode?function(){if(console.log("pick",levels[level_id][currentColumn][currentLane]),!started)return;pick_item=levels[level_id][currentColumn][currentLane][1],pick_item_nb=parseInt(levels[level_id][currentColumn][currentLane][2]),pick_item_nb>=0||(pick_item_nb=" ");if(type_color="b"==pick_item?colors.bois:colors.metal,cell=i(),drop_cell=levels[level_id][cell.column]&&levels[level_id][cell.column]?levels[level_id][cell.column][cell.lane]:null,update_player=!1,console.log("cell",cell),console.log("player pick",player_pick),console.log("direction",direction),console.log("pick column",levels[level_id][currentColumn]),console.log("pick cell",levels[level_id][currentColumn][currentLane]),console.log("pick item",pick_item),console.log("pick_item_nb",pick_item_nb),console.log("drop_cell",drop_cell),need_to_drop=[],picked=!1,"h"==pick_item||"a"==pick_item||"w"==pick_item)console.log("pick == axe ou pickaxe ou waterbucket"),need_to_drop=player_pick,lanes[currentLane].mesh.children[currentColumn].children.pop(),levels[level_id][currentColumn][currentLane]=levels[level_id][currentColumn][currentLane].replaceAt(1," "),player_pick=[pick_item],update_player=!0;else if("b"==pick_item||"p"==pick_item){if(console.log("pick == bois ou pierre"),player_pick.length>=3)console.warn("cant pick more"),picked=!1,need_to_drop=player_pick;else{console.warn("picked true"),picked=!0,need_to_drop=player_pick,pick_item_nb<=3?(levels[level_id][currentColumn][currentLane]=levels[level_id][currentColumn][currentLane].replaceAt(1," "),levels[level_id][currentColumn][currentLane]=levels[level_id][currentColumn][currentLane].replaceAt(2," ")):levels[level_id][currentColumn][currentLane]=levels[level_id][currentColumn][currentLane].replaceAt(2,(pick_item_nb-3).toString());for(let e=0;e<=pick_item_nb&&e<3;e++)player_pick.push(pick_item),lanes[currentLane].mesh.children[currentColumn].children.pop()}update_player=!0}if(console.log("need_to_drop",need_to_drop),console.log("before drop",levels[level_id][currentColumn][currentLane]),console.log("drop_cell",drop_cell),console.log("player_pick",player_pick),null!=drop_cell&&"w"==drop_cell[0]&&player_pick.length>0&&"b"==player_pick[0]){console.log("drop == waterGround"),levels[level_id][cell.column][cell.lane]=levels[level_id][cell.column][cell.lane].replaceAt(0,"x");let e=new WaterGround;lanes[cell.lane].mesh.children[cell.column].add(e),player_pick.shift(),update_player=!0}else if(null!=drop_cell&&"s"==drop_cell[2]&&player_pick.length>0){if(console.log("drop == wagon stock"),"b"==player_pick[0]&&(index=1,start_at=counter.b,can_drop=6-start_at),"p"==player_pick[0]&&(index=2,start_at=counter.p,can_drop=6-start_at),can_drop>3&&(can_drop=player_pick.length),can_drop<=0&&(can_drop=6-start_at),can_drop>0){type_color="b"==player_pick[0]?colors.bois:colors.metal,can_drop>player_pick.length&&(can_drop=player_pick.length);for(let e=start_at;e<can_drop+start_at;e++)wstock.children[index].children[e].visible=!0,counter[player_pick[0]]++,player_pick.shift();update_player=!0,t()}update_player=!0,console.log("counter after",JSON.parse(JSON.stringify(counter)))}else if(null!=drop_cell&&"r"==drop_cell[2]&&0==player_pick.length&&stock.rails>0)console.log("drop == wagon rails"),player_pick=["r","r","r"],update_player=!0;else if(null!=drop_cell&&(" "==pick_item&&player_pick.length>0&&"w"==player_pick[0]||"w"==need_to_drop[0]))console.log("drop == water bucket"),lanes[currentLane].mesh.children[currentColumn].add(new WaterBucket),levels[level_id][currentColumn][currentLane]=levels[level_id][currentColumn][currentLane].replaceAt(1,"w"),update_player=!0,"w"!=need_to_drop[0]&&(player_pick=[]);else if(null!=drop_cell&&(" "==pick_item&&player_pick.length>0&&"h"==player_pick[0]||"h"==need_to_drop[0]))console.log("drop == hache"),lanes[currentLane].mesh.children[currentColumn].add(new Hache),levels[level_id][currentColumn][currentLane]=levels[level_id][currentColumn][currentLane].replaceAt(1,"h"),update_player=!0,"h"!=need_to_drop[0]&&(player_pick=[]);else if(null!=drop_cell&&(" "==pick_item&&player_pick.length>0&&"a"==player_pick[0]||"a"==need_to_drop[0]))console.log("drop == axe"),lanes[currentLane].mesh.children[currentColumn].add(new Axe),levels[level_id][currentColumn][currentLane]=levels[level_id][currentColumn][currentLane].replaceAt(1,"a"),update_player=!0,"a"!=need_to_drop[0]&&(player_pick=[]);else if(!picked&&null!=drop_cell&&" "==drop_cell[1]&&player_pick.length>0&&("b"==player_pick[0]||"p"==player_pick[0]))if(console.log("drop == bois sur g / o / b",player_pick),player_pick.length>0&&player_pick[0]!=levels[level_id][currentColumn][currentLane][1]&&" "!=levels[level_id][currentColumn][currentLane][1])console.warn("cant drop on diffrent type"),type_color="b"==player_pick[0]?colors.bois:colors.metal;else{levels[level_id][currentColumn][currentLane]=levels[level_id][currentColumn][currentLane].replaceAt(1,player_pick[0]),start_at=pick_item_nb>0?pick_item_nb:0,player_pick.length>1&&(levels[level_id][currentColumn][currentLane]=levels[level_id][currentColumn][currentLane].replaceAt(2,(start_at+player_pick.length).toString()));for(let e=start_at;e<player_pick.length+start_at;e++)"b"==player_pick[0]?sb=new Stock("bois"):sb=new Stock("metal"),sb.position.y=-25,sb.position.z=3*e-2,e%2!=0&&(sb.rotation.z=Math.PI,sb.position.x=positionWidth,sb.position.y=-4),lanes[currentLane].mesh.children[currentColumn].add(sb);update_player=!0,"b"==need_to_drop[0]&&"p"==need_to_drop[0]||(player_pick=[])}if(1==update_player)if(console.log("update_player",update_player),console.log("player_pick",player_pick),console.log("type_color",type_color),player_pick.length>0)"b"==player_pick[0]||"p"==player_pick[0]?(player_pick.length>=1&&(player.children[2].children[2].visible=!0,player.children[2].children[3].visible=!0,player.children[2].children[2].material.color.setHex(type_color),player.children[2].children[3].material.color.setHex(type_color),player.children[2].children[4].visible=!1,player.children[2].children[5].visible=!1),player_pick.length>=2&&(player.children[2].children[4].visible=!0,player.children[2].children[5].visible=!0,player.children[2].children[4].material.color.setHex(type_color),player.children[2].children[5].material.color.setHex(type_color),player.children[2].children[6].visible=!1,player.children[2].children[7].visible=!1),player_pick.length>=3&&(player.children[2].children[6].visible=!0,player.children[2].children[7].visible=!0,player.children[2].children[6].material.color.setHex(type_color),player.children[2].children[7].material.color.setHex(type_color))):"r"==player_pick[0]?(player.children[2].children[8].visible=!0,player.children[2].children[9].visible=!0,player.children[2].children[10].visible=!0):"w"==player_pick[0]?(player.children[2].children[11].visible=!0,player.children[2].children[12].visible=!1,player.children[2].children[13].visible=!1):"h"==player_pick[0]?(player.children[2].children[11].visible=!1,player.children[2].children[12].visible=!0,player.children[2].children[13].visible=!1):"a"==player_pick[0]&&(player.children[2].children[11].visible=!1,player.children[2].children[13].visible=!0,player.children[2].children[12].visible=!1),player.children[2].children[1].rotation.x=Math.PI/2,player.children[2].children[1].rotation.y=Math.PI/2,player.children[2].children[1].position.x=10,player.children[2].children[0].rotation.x=Math.PI/2,player.children[2].children[0].rotation.y=Math.PI/2,player.children[2].children[0].position.x=10;else if(0==player_pick.length){player.children[2].children[1].rotation.x=0,player.children[2].children[1].rotation.y=0,player.children[2].children[1].position.x=0,player.children[2].children[0].rotation.x=0,player.children[2].children[0].rotation.y=0,player.children[2].children[0].position.x=0;for(let e=2;e<=6;e+=2)player.children[2].children[e].visible=!1,player.children[2].children[e+1].visible=!1;player.children[2].children[8].visible=!1,player.children[2].children[9].visible=!1,player.children[2].children[10].visible=!1,player.children[2].children[11].visible=!1,player.children[2].children[12].visible=!1,player.children[2].children[13].visible=!1}console.log("pick column after",levels[level_id][currentColumn])}():"38"==e.keyCode?a("left"):"40"==e.keyCode?a("right"):"37"==e.keyCode?a("backward"):"39"==e.keyCode&&a("forward")}),window.addEventListener("DOMContentLoaded",e=>{!function(){initialCameraPositionY+=400,initialCameraPositionX+=300,camera.position.y=initialCameraPositionX,camera.position.x=initialCameraPositionY,camera.position.z=distance,currentLane=3,currentColumn=columns/2,hemiLight=new THREE.HemisphereLight(16777215,16777215,.6),scene.add(hemiLight),dirLight=new THREE.DirectionalLight(16777215,.6),dirLight.position.set(initialDirLightPositionX,initialDirLightPositionY,400),dirLight.castShadow=!0,scene.add(dirLight),dirLight.shadow.mapSize.width=2048,dirLight.shadow.mapSize.height=2048;var e=800;dirLight.shadow.camera.left=e,dirLight.shadow.camera.right=-e,dirLight.shadow.camera.top=-e,dirLight.shadow.camera.bottom=e,backLight=new THREE.DirectionalLight(0,.4),backLight.position.set(200,200,50),backLight.castShadow=!0}(),n(),t(),renderer.render(scene,camera),requestAnimationFrame(c),window.scene=scene,window.THREE=THREE})}});
+function initaliseValues() {
+
+
+    water_bucket_position = [11, 2];
+    hache_position = [11, 3];
+    axe_position = [11, 4];
+    train_position = [9, 9];
+    train_length = 7;
+    train_counter = 0;
+    train_countdown = 1000;
+    currentLane = 7;
+    currentColumn = 12;
+    currentLane = 3;
+    currentColumn = 8;
+    level_id = 0;
+    stock = {
+        rails: 0,
+        pierre: 0,
+        bois: 0,
+    }
+    level_distance = levels[level_id][0].length;
+    player_pick = [];
+
+    previousTimestamp = null;
+
+    startMoving = false;
+    moves = [];
+    directions = [];
+    moves_players = [];
+
+    player = new Player(currentLane, currentColumn);
+    player.position.x = currentColumn * positionWidth * zoom;
+    player.position.y = currentLane * positionWidth * zoom;
+    scene.add(player);
+
+
+    camera.position.y = initialCameraPositionY;
+    camera.position.x = initialCameraPositionX;
+
+
+    dirLight.position.x = initialDirLightPositionX;
+    dirLight.position.y = initialDirLightPositionY;
+    // dirLight.target = train;
+
+    lanes = generateLanes();
+    train = generateTrain();
+    wwater = generateWagonWater();
+    wstock = generateWagonStock();
+    wrails = generateWagonRails();
+    train_smoke = new Smoke();
+    wwater_smoke = new Smoke();
+    train_smoke_default = new Smoke();
+    train.add(train_smoke);
+    scene.add(train);
+    wwater_smoke.position.y = - 20;
+    wwater_smoke.visible = false;
+    wwater.add(wwater_smoke);
+    scene.add(wwater);
+    scene.add(wstock);
+    scene.add(wrails);
+
+    menu.style.display = 'none';
+    start();
+};
+
+renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    antialias: true
+});
+
+function createStats() {
+    var stats = new Stats();
+    stats.setMode(0);
+
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.left = '0';
+    stats.domElement.style.top = '0';
+
+    return stats;
+}
+String.prototype.replaceAt = function (index, replacement) {
+    return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+}
+
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+document.addEventListener("DOMContentLoaded", function () {
+    var scale = 'scale(1)';
+    document.body.style.zoom = (window.innerWidth / window.outerWidth);
+    document.body.style.webkitTransform = scale;    // Chrome, Opera, Safari
+    document.body.style.msTransform = scale;       // IE 9
+    document.body.style.transform = scale;     // General
+});
+
+document.querySelector("#retry").addEventListener("click", () => {
+    lanes.forEach(lane => scene.remove(lane.mesh));
+    initaliseValues();
+    endDOM.style.visibility = 'hidden';
+});
+
+document.addEventListener('mousewheel', (data) => {
+    console.log("mousewheel", data);
+    if (data.deltaY > 0)
+        camera.zoom -= 0.01;
+    else
+        camera.zoom += 0.01;
+    camera.updateProjectionMatrix();
+}, false);
+
+document.getElementById('forward').addEventListener("click", () => move('left'));
+
+document.getElementById('backward').addEventListener("click", () => move('right'));
+
+document.getElementById('left').addEventListener("click", () => move('backward'));
+
+document.getElementById('right').addEventListener("click", () => move('forward'));
+
+window.addEventListener("keydown", event => {
+    // console.log("event.keyCode", event.keyCode);
+
+    if (event.keyCode == '32') {
+        pick();
+    }
+    else if (event.keyCode == '38') {
+        // up arrow
+        // move('forward');
+        move('left');
+    } else if (event.keyCode == '40') {
+        // down arrow
+        // move('backward');
+        move('right');
+    } else if (event.keyCode == '37') {
+        // left arrow
+        // move('left');
+        move('backward');
+    } else if (event.keyCode == '39') {
+        // right arrow
+        // move('right');
+        move('forward');
+    }
+});
+
+function pick() {
+    console.log("pick", levels[level_id][currentColumn][currentLane]);
+
+    if (!started)
+        return;
+    pick_item = levels[level_id][currentColumn][currentLane][1];
+    pick_item_nb = parseInt(levels[level_id][currentColumn][currentLane][2]);
+    if (!(pick_item_nb >= 0))
+        pick_item_nb = ' ';
+    type_color = (pick_item == 'b' ? colors.bois : colors.metal);
+    cell = getCell();
+    drop_cell = levels[level_id][cell.column] && levels[level_id][cell.column] ? levels[level_id][cell.column][cell.lane] : null;
+    update_player = false;
+    console.log("cell", cell)
+    console.log("player pick", player_pick)
+    console.log("direction", direction)
+    console.log("pick column", levels[level_id][currentColumn]);
+    console.log("pick cell", levels[level_id][currentColumn][currentLane]);
+    console.log("pick item", pick_item);
+    console.log("pick_item_nb", pick_item_nb);
+    console.log("drop_cell", drop_cell);
+
+    need_to_drop = [];
+    picked = false;
+
+    // Si pick == axe ou pickaxe ou waterbucket
+    if (pick_item == 'h' || pick_item == 'a' || pick_item == 'w') {
+        console.log("pick == axe ou pickaxe ou waterbucket");
+        need_to_drop = player_pick;
+        lanes[currentLane].mesh.children[currentColumn].children.pop();
+        levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, ' ');
+        player_pick = [pick_item];
+        update_player = true;
+    }
+    // Si pick == bois ou pierre
+    else if (pick_item == 'b' || pick_item == 'p') {
+        console.log("pick == bois ou pierre");
+        // Disable pick if max length but enable pick & drop
+        if (player_pick.length >= 3) {
+            console.warn("cant pick more");
+            picked = false;
+            need_to_drop = player_pick;
+        }
+        else {
+            console.warn("picked true");
+            picked = true;
+            need_to_drop = player_pick;
+            if (pick_item_nb <= 3) {
+                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, " ");
+                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(2, " ");
+            } else
+                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(2, (pick_item_nb - 3).toString());
+
+            // player_pick = [pick_item];
+            // lanes[currentLane].mesh.children[currentColumn].children.pop();
+            for (let i = 0; i <= pick_item_nb && i < 3; i++) {
+                player_pick.push(pick_item);
+                lanes[currentLane].mesh.children[currentColumn].children.pop();
+            }
+        }
+        update_player = true;
+    }
+
+    console.log("need_to_drop", need_to_drop);
+    console.log("before drop", levels[level_id][currentColumn][currentLane]);
+
+    console.log("drop_cell", drop_cell);
+    console.log("player_pick", player_pick);
+    // Si drop == waterGround
+    if (drop_cell != null && drop_cell[0] == 'w' && player_pick.length > 0 && player_pick[0] == "b") {
+        console.log("drop == waterGround");
+        levels[level_id][cell.column][cell.lane] = levels[level_id][cell.column][cell.lane].replaceAt(0, 'x');
+        let wg = new WaterGround();
+        lanes[cell.lane].mesh.children[cell.column].add(wg);
+        player_pick.shift();
+        update_player = true;
+    }
+    // Si drop == wagon stock
+    else if (drop_cell != null && drop_cell[2] == 's' && player_pick.length > 0) {
+        console.log("drop == wagon stock");
+        if (player_pick[0] == 'b') {
+            index = 1;
+            start_at = counter.b;
+            can_drop = 6 - start_at;
+        }
+        if (player_pick[0] == 'p') {
+            index = 2;
+            start_at = counter.p;
+            can_drop = 6 - start_at;
+        }
+        if (can_drop > 3)
+            can_drop = player_pick.length;
+        if (can_drop <= 0)
+            can_drop = 6 - start_at;
+        if (can_drop > 0) {
+            type_color = player_pick[0] == 'b' ? colors.bois : colors.metal;
+            if (can_drop > player_pick.length)
+                can_drop = player_pick.length;
+            for (let i = start_at; i < can_drop + start_at; i++) {
+                wstock.children[index].children[i].visible = true;
+                counter[player_pick[0]]++;
+                player_pick.shift();
+            }
+            update_player = true;
+            updateCounter();
+        }
+        update_player = true;
+        console.log("counter after", JSON.parse(JSON.stringify(counter)));
+        // train.children[1].children[5].visible = true;
+    }
+    // Si drop == wagon rails
+    else if (drop_cell != null && drop_cell[2] == 'r' && player_pick.length == 0 && stock.rails > 0) {
+        console.log("drop == wagon rails");
+        player_pick = ['r', 'r', 'r'];
+        update_player = true;
+    }
+    // Si drop == water bucket
+    else if (drop_cell != null && ((pick_item == " " && player_pick.length > 0 && player_pick[0] == 'w') || need_to_drop[0] == "w")) {
+        console.log("drop == water bucket");
+        lanes[currentLane].mesh.children[currentColumn].add(new WaterBucket());
+        levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, 'w');
+        update_player = true;
+        if (need_to_drop[0] != "w")
+            player_pick = [];
+    }
+    // Si drop == hache
+    else if (drop_cell != null && ((pick_item == " " && player_pick.length > 0 && player_pick[0] == 'h') || need_to_drop[0] == "h")) {
+        console.log("drop == hache");
+        lanes[currentLane].mesh.children[currentColumn].add(new Hache());
+        levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, 'h');
+        update_player = true;
+        if (need_to_drop[0] != "h")
+            player_pick = [];
+    }
+    // Si drop == axe
+    else if (drop_cell != null && ((pick_item == " " && player_pick.length > 0 && player_pick[0] == 'a') || need_to_drop[0] == "a")) {
+        console.log("drop == axe");
+        lanes[currentLane].mesh.children[currentColumn].add(new Axe());
+        levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, 'a');
+        update_player = true;
+        if (need_to_drop[0] != "a")
+            player_pick = [];
+    }
+    // Si drop == bois ou pierre sur g / o / b
+    else if (!picked && drop_cell != null && drop_cell[1] == " " && player_pick.length > 0 && (player_pick[0] == "b" || player_pick[0] == "p")) {
+        console.log("drop == bois sur g / o / b", player_pick);
+        //verification type different
+        if (player_pick.length > 0 && player_pick[0] != levels[level_id][currentColumn][currentLane][1] && levels[level_id][currentColumn][currentLane][1] != " ") {
+            console.warn('cant drop on diffrent type');
+            type_color = (player_pick[0] == 'b' ? colors.bois : colors.metal);
+        }
+        else {
+            levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(1, player_pick[0]);
+            start_at = pick_item_nb > 0 ? pick_item_nb : 0;
+            if (player_pick.length > 1)
+                levels[level_id][currentColumn][currentLane] = levels[level_id][currentColumn][currentLane].replaceAt(2, (start_at + player_pick.length).toString());
+
+            for (let i = start_at; i < (player_pick.length + start_at); i++) {
+                if (player_pick[0] == 'b')
+                    sb = new Stock('bois');
+                else
+                    sb = new Stock('metal');
+                // console.log("add", player_pick[0]);
+                sb.position.y = -25;
+                sb.position.z = (i * 3) - 2;
+
+                if (i % 2 !== 0) {
+                    sb.rotation.z = Math.PI;
+                    sb.position.x = positionWidth;
+                    sb.position.y = -4;
+                }
+                lanes[currentLane].mesh.children[currentColumn].add(sb);
+            }
+            update_player = true;
+            if (need_to_drop[0] != "b" || need_to_drop[0] != "p")
+                player_pick = [];
+        }
+    }
+
+    // console.log("after drop", levels[level_id][currentColumn][currentLane]);
+    if (update_player == true) {
+        console.log("update_player", update_player)
+        console.log("player_pick", player_pick)
+        console.log("type_color", type_color)
+        // player.children[3].rotation.z = Math.PI / 2;
+
+        if (player_pick.length > 0) {
+            if (player_pick[0] == 'b' || player_pick[0] == 'p') {
+                if (player_pick.length >= 1) {
+                    player.children[2].children[2].visible = true;
+                    player.children[2].children[3].visible = true;
+                    player.children[2].children[2].material.color.setHex(type_color);
+                    player.children[2].children[3].material.color.setHex(type_color);
+                    player.children[2].children[4].visible = false;
+                    player.children[2].children[5].visible = false;
+                }
+                if (player_pick.length >= 2) {
+                    player.children[2].children[4].visible = true;
+                    player.children[2].children[5].visible = true;
+                    player.children[2].children[4].material.color.setHex(type_color);
+                    player.children[2].children[5].material.color.setHex(type_color);
+                    player.children[2].children[6].visible = false;
+                    player.children[2].children[7].visible = false;
+                }
+                if (player_pick.length >= 3) {
+                    player.children[2].children[6].visible = true;
+                    player.children[2].children[7].visible = true;
+                    player.children[2].children[6].material.color.setHex(type_color);
+                    player.children[2].children[7].material.color.setHex(type_color);
+                }
+            }
+            else if (player_pick[0] == 'r') {
+                player.children[2].children[8].visible = true;
+                player.children[2].children[9].visible = true;
+                player.children[2].children[10].visible = true;
+            }
+            else if (player_pick[0] == 'w') {
+                player.children[2].children[11].visible = true;
+                player.children[2].children[12].visible = false;
+                player.children[2].children[13].visible = false;
+            }
+            else if (player_pick[0] == 'h') {
+                player.children[2].children[11].visible = false;
+                player.children[2].children[12].visible = true;
+                player.children[2].children[13].visible = false;
+            }
+            else if (player_pick[0] == 'a') {
+                player.children[2].children[11].visible = false;
+                player.children[2].children[13].visible = true;
+                player.children[2].children[12].visible = false;
+            }
+
+            // BRAS TENDU
+            player.children[2].children[1].rotation.x = Math.PI / 2;
+            player.children[2].children[1].rotation.y = Math.PI / 2;
+            player.children[2].children[1].position.x = 10;
+            player.children[2].children[0].rotation.x = Math.PI / 2;
+            player.children[2].children[0].rotation.y = Math.PI / 2;
+            player.children[2].children[0].position.x = 10;
+
+        }
+        else if (player_pick.length == 0) {
+            // BRAS BAISSE
+            player.children[2].children[1].rotation.x = 0;
+            player.children[2].children[1].rotation.y = 0;
+            player.children[2].children[1].position.x = 0;
+            player.children[2].children[0].rotation.x = 0;
+            player.children[2].children[0].rotation.y = 0;
+            player.children[2].children[0].position.x = 0;
+            for (let i = 2; i <= 6; i = i + 2) {
+                player.children[2].children[i].visible = false;
+                player.children[2].children[i + 1].visible = false;
+            }
+
+            // Rails
+            player.children[2].children[8].visible = false;
+            player.children[2].children[9].visible = false;
+            player.children[2].children[10].visible = false;
+            // Water bucket
+            player.children[2].children[11].visible = false;
+            // Hache
+            player.children[2].children[12].visible = false;
+            // Axe
+            player.children[2].children[13].visible = false;
+        }
+
+    }
+
+    console.log("pick column after", levels[level_id][currentColumn]);
+}
+
+function getCell() {
+    if (direction === 'forward') return { lane: currentLane + 1, column: currentColumn };
+    if (direction === 'backward') return { lane: currentLane - 1, column: currentColumn };
+    if (direction === 'left') return { lane: currentLane, column: currentColumn - 1 };
+    if (direction === 'right') return { lane: currentLane, column: currentColumn + 1 };
+}
+
+function action() {
+    if (!started)
+        return;
+    nextCell = getCell();
+    if (nextCell.column < 0 || nextCell.column >= columns || nextCell.lane < 0)
+        return;
+    console.log("action nextCell", nextCell);
+    console.log("action direction", direction);
+    console.log("action", levels[level_id][nextCell.column][nextCell.lane]);
+    if (levels[level_id][nextCell.column][nextCell.lane][1] == 't' && player_pick[0] == 'h')
+        return cutForest(nextCell.column, nextCell.lane);
+    if (levels[level_id][nextCell.column][nextCell.lane][1] == 'r' && player_pick[0] == 'a')
+        return cutRock(nextCell.column, nextCell.lane);
+    // if (counter.rocks < 10 || counter.woods < 10)
+    //     return;
+    // rails = new Rails();
+    // let position_x = finalPositions.column;
+    // console.log("rails.position", rails.position);
+    // rails.position.x = (position_x * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2;
+    // rails.position.y = (finalPositions.lane * positionWidth * zoom);
+
+    // console.log("rails.position after", rails.position);
+    // rails.updateMatrix();
+    // rails.matrixAutoUpdate = false;
+    // setTimeout(() => {
+    //     scene.add(rails);
+    //     counter.rails++;
+    //     counter.rocks -= 10;
+    //     counter.woods -= 10;
+    //     updateCounter();
+    // }, 0, 20);
+    // console.log(lanes[finalPositions.lane]);
+
+    // scene.add(rails);
+}
+
+function updateCounter() {
+    statsRocksDOM.innerHTML = counter.p;
+    statsWoodsDOM.innerHTML = counter.b;
+    counterDOM.innerHTML = counter.r;
+}
+function cutForest(column, lane) {
+    console.log("cutForest currentColumn", currentColumn, column);
+    console.log("cutForest currentLane", currentLane, lane);
+    if (!started)
+        return;
+    console.log("lanes[lane].mesh.children[column].children[1].position.z ", lanes[lane].mesh.children[column].children[1].position.z);
+    console.log("levels[level_id][column][lane]", levels[level_id][column][lane]);
+    if (lanes[lane].mesh.children[column].children[1].position.z > -34) {
+        lanes[lane].mesh.children[column].children[1].position.z -= 7;
+        updateCounter();
+    }
+    else {
+        lanes[lane].mesh.children[column].children[1].position.z = -40;
+        levels[level_id][column][lane] = levels[level_id][column][lane][0] + 'b';
+        lanes[lane].mesh.children[column].children[1].children[0].position.z = 42;
+        lanes[lane].mesh.children[column].children[1].children[0].position.y = 4;
+        lanes[lane].mesh.children[column].children[1].children[0].scale.x = 2.5;
+        lanes[lane].mesh.children[column].children[1].children[0].scale.z = 0.3;
+        lanes[lane].mesh.children[column].children[1].children[1].position.z = 42;
+        lanes[lane].mesh.children[column].children[1].children[1].position.y = -9;
+        lanes[lane].mesh.children[column].children[1].children[1].scale.x = 2.5;
+        lanes[lane].mesh.children[column].children[1].children[1].scale.z = 0.3;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.z = 0.1;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.x = 0.1;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.y = 0.1;
+        // lanes[lane].mesh.children[column].children[1].children[1].scale.x = 3;
+    }
+    return;
+}
+function cutRock(column, lane) {
+    console.log("cutForest currentColumn", currentColumn, column);
+    console.log("cutForest currentLane", currentLane, lane);
+    if (!started)
+        return;
+    console.log("lanes[lane].mesh.children[column].children[1].position.z ", lanes[lane].mesh.children[column].children[1].position.z);
+    console.log("levels[level_id][column][lane]", levels[level_id][column][lane]);
+    if (lanes[lane].mesh.children[column].children[1].position.z > -34) {
+        lanes[lane].mesh.children[column].children[1].position.z -= 7;
+        updateCounter();
+    }
+    else {
+        lanes[lane].mesh.children[column].children[1].position.z = -40;
+        levels[level_id][column][lane] = levels[level_id][column][lane][0] + 'p';
+        lanes[lane].mesh.children[column].children[1].children[0].position.z = 42;
+        lanes[lane].mesh.children[column].children[1].children[0].position.y = 4;
+        lanes[lane].mesh.children[column].children[1].children[0].scale.x = 2.5;
+        lanes[lane].mesh.children[column].children[1].children[0].scale.z = 0.3;
+        lanes[lane].mesh.children[column].children[1].children[1].position.z = 42;
+        lanes[lane].mesh.children[column].children[1].children[1].position.y = -9;
+        lanes[lane].mesh.children[column].children[1].children[1].scale.x = 2.5;
+        lanes[lane].mesh.children[column].children[1].children[1].scale.z = 0.3;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.z = 0.1;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.x = 0.1;
+        lanes[lane].mesh.children[column].children[1].children[2].scale.y = 0.1;
+        // lanes[lane].mesh.children[column].children[1].children[1].scale.x = 3;
+    }
+    return;
+}
+
+function addPlayer(userId) {
+
+    // players[userId] = new Player();
+    // scene.add(players[userId]);
+
+
+    // positionX = (2 * positionWidth + positionWidth / 2) * zoom;
+
+    // players[userId].position.x = positionX; // initial player position is 0
+
+}
+
+function setDirections(next_direction) {
+    action();
+    directions.push(next_direction)
+}
+function move(pdirection, userId = null) {
+    direction = pdirection;
+    if (channel) {
+        if (userId == null) {
+            channel.send({ 'type': 'move', 'direction': direction });
+        }
+        else {
+            return moves_players.push({ userId: userId, direction: direction });
+        }
+    }
+    finalPositions = moves.reduce((position, move) => {
+        if (move === 'forward') return { lane: position.lane + 1, column: position.column };
+        if (move === 'backward') return { lane: position.lane - 1, column: position.column };
+        if (move === 'left') return { lane: position.lane, column: position.column - 1 };
+        if (move === 'right') return { lane: position.lane, column: position.column + 1 };
+    }, { lane: currentLane, column: currentColumn });
+    // console.log("-------");
+    // console.log("direction", direction);
+    // console.log("direction", direction);
+
+    can_walk_ground = ['e', 'w']
+    can_walk_addon = ['t', 'r', 'm', 's', 'd'];//, 'w', 'a', 'h']; // tree / rock / metal / station / disable / waterbucket / axe / hache
+    can_walk_train = ['r', 's', 't', 'w']; // rails / stock / train / water
+
+    if (direction === 'forward') {
+        if (finalPositions.lane + 1 >= level_distance) {
+            return setDirections('forward');
+        }
+        else {
+            // console.log("next cell", levels[level_id][finalPositions.column][finalPositions.lane + 1]);
+            if (can_walk_ground.indexOf(levels[level_id][finalPositions.column][finalPositions.lane + 1][0]) !== -1)
+                return setDirections('forward');
+            if (can_walk_addon.indexOf(levels[level_id][finalPositions.column][finalPositions.lane + 1][1]) !== -1)
+                return setDirections('forward');
+            if (can_walk_train.indexOf(levels[level_id][finalPositions.column][finalPositions.lane + 1][2]) !== -1)
+                return setDirections('forward');
+            if (!stepStartTimestamp)
+                startMoving = true;
+            addLane();
+        }
+    } else if (direction === 'backward') {
+        if (finalPositions.lane <= 0) {
+            return setDirections('backward');
+        }
+        else {
+            console.log("next cell", levels[level_id][finalPositions.column][finalPositions.lane - 1]);
+            if (can_walk_ground.indexOf(levels[level_id][finalPositions.column][finalPositions.lane - 1][0]) !== -1)
+                return setDirections('backward');
+            if (can_walk_addon.indexOf(levels[level_id][finalPositions.column][finalPositions.lane - 1][1]) !== -1)
+                return setDirections('backward');
+            if (can_walk_train.indexOf(levels[level_id][finalPositions.column][finalPositions.lane - 1][2]) !== -1)
+                return setDirections('backward');
+            if (!stepStartTimestamp)
+                startMoving = true;
+        }
+    } else if (direction === 'left') {
+        if (finalPositions.column === 0) return;
+        if (finalPositions.lane < 0) {
+            if (!stepStartTimestamp) { startMoving = true; }
+        }
+        else {
+            console.log("next cell", levels[level_id][finalPositions.column - 1][finalPositions.lane]);
+            if (can_walk_ground.indexOf(levels[level_id][finalPositions.column - 1][finalPositions.lane][0]) !== -1)
+                return setDirections('left');
+            if (can_walk_addon.indexOf(levels[level_id][finalPositions.column - 1][finalPositions.lane][1]) !== -1)
+                return setDirections('left');
+            if (can_walk_train.indexOf(levels[level_id][finalPositions.column - 1][finalPositions.lane][2]) !== -1)
+                return setDirections('left');
+            if (!stepStartTimestamp) startMoving = true;
+        }
+    } else if (direction === 'right') {
+        if (finalPositions.column === columns - 1) return;
+        if (finalPositions.lane < 0) {
+            if (!stepStartTimestamp) { startMoving = true; }
+        }
+        else {
+            console.log("next cell", levels[level_id][finalPositions.column + 1][finalPositions.lane]);
+            if (can_walk_ground.indexOf(levels[level_id][finalPositions.column + 1][finalPositions.lane][0]) !== -1)
+                return setDirections('right');
+            if (can_walk_addon.indexOf(levels[level_id][finalPositions.column + 1][finalPositions.lane][1]) !== -1)
+                return setDirections('right');
+            if (can_walk_train.indexOf(levels[level_id][finalPositions.column + 1][finalPositions.lane][2]) !== -1)
+                return setDirections('right');
+            if (!stepStartTimestamp) startMoving = true;
+        }
+    }
+
+    // console.log("dirLight.position.x", dirLight.position.x);
+    // console.log("dirLight.position.y", dirLight.position.y);
+    if (userId == null) {
+        moves.push(direction);
+    }
+}
+
+function animate(timestamp) {
+    requestAnimationFrame(animate);
+
+    if (!previousTimestamp) previousTimestamp = timestamp;
+    delta = timestamp - previousTimestamp;
+    previousTimestamp = timestamp;
+
+    dirLight.position.x = initialDirLightPositionX;
+    // console.log("camera.position.y", camera.position.y);
+    if (started && train_countdown <= - 1) {
+        // console.log("train_counter", train_counter);
+        if (train_counter >= positionWidth * zoom) {
+            for (let i = train_position[1] - train_length; i <= train_position[1]; i++) {
+                j = train_position[1] - i;
+                // console.log("j", j);
+                // console.log("i", i);
+                if (j <= 1)
+                    levels[level_id][train_position[0]][i] = 'glt';
+                else if (j <= 2)
+                    levels[level_id][train_position[0]][i] = 'glw';
+                else if (j <= 4)
+                    levels[level_id][train_position[0]][i] = 'gls';
+                else if (j <= 6)
+                    levels[level_id][train_position[0]][i] = 'glr';
+                else if (j == 7)
+                    levels[level_id][train_position[0]][i] = 'gl'
+
+            }
+            y = train_position[1];
+            y++;
+            train_position = [train_position[0], y];
+            train_counter = 0;
+            // console.log(" levels[level_id][train_position[" + train_position[0] + "]]", levels[level_id][train_position[0]]);
+            // console.log("train_position", train_position);
+        }
+
+        train_counter += 1 / 100 * delta;
+        train.position.y += 1 / 100 * delta;
+        wwater.position.y += 1 / 100 * delta;
+        wstock.position.y += 1 / 100 * delta;
+        wrails.position.y += 1 / 100 * delta;
+        if (wwater.children[0].children[0].scale.z > 0) {
+            wwater.children[0].children[0].scale.z -= 0.0002;
+        }
+        else {
+            train_smoke.children[0].material.color.setHex(colors.red);
+            wwater_smoke.children[0].material.color.setHex(colors.red);
+            wwater_smoke.visible = true;
+            if (wwater.children[0].children[0].visible == true) {
+                wwater.children[0].children[0].visible = false;
+                train_smoke.children[0].material.opacity = 0.99;
+            }
+        }
+
+        let timing_smoke = 3000;
+        if (wwater.children[0].children[0].visible == false) {
+            timing_smoke = 9000;
+        }
+
+        // console.log("wwater.children[0].children[0].scale.z", wwater.children[0].children[0].scale.z);
+
+        train_smoke.position.z += 1 / 500 * delta;
+        train_smoke.position.y -= 1 / 100 * delta;
+        train_smoke.scale.x += 1 / 4000 * delta;
+        train_smoke.scale.y += 1 / 4000 * delta;
+        train_smoke.scale.z += 1 / 4000 * delta;
+        train_smoke.children[0].material.opacity -= 1 / timing_smoke * delta;
+        if (wwater.children[0].children[0].visible == false) {
+
+            wwater_smoke.position.z += 1 / 500 * delta;
+            wwater_smoke.position.y -= 1 / 100 * delta;
+            wwater_smoke.scale.x += 1 / 4000 * delta;
+            wwater_smoke.scale.y += 1 / 4000 * delta;
+            wwater_smoke.scale.z += 1 / 4000 * delta;
+            wwater_smoke.children[0].material.opacity -= 1 / timing_smoke * delta;
+        }
+        // console.log("train_smoke.children[0].material.opacity", train_smoke.children[0].material.opacity);
+        if (train_smoke.children[0].material.opacity < 0) {
+            // console.log("train_smoke_default", train_smoke_default);
+            train_smoke.children[0].material.opacity = 0.99;
+            train_smoke.position.z = train_smoke_default.position.z;
+            train_smoke.scale.z = train_smoke_default.scale.z;
+            train_smoke.scale.y = train_smoke_default.scale.y;
+            train_smoke.scale.x = train_smoke_default.scale.x;
+            train_smoke.position.y = train_smoke_default.position.y;
+
+            if (wwater.children[0].children[0].visible == false) {
+                wwater_smoke.children[0].material.opacity = 0.99;
+                wwater_smoke.position.z = train_smoke_default.position.z;
+                wwater_smoke.scale.z = train_smoke_default.scale.z;
+                wwater_smoke.scale.y = train_smoke_default.scale.y;
+                wwater_smoke.scale.x = train_smoke_default.scale.x;
+                wwater_smoke.position.y = -20;
+            }
+        }
+
+
+
+        camera.position.y += 1 / 100 * delta;
+
+        // scene.translateY(1 / 100 * delta * -1);
+    }
+    else if (train_countdown > -1) {
+        train_countdown -= 1;
+
+        // console.log("train_countdown", train_countdown);
+        if (Number.isInteger(train_countdown / 100)) {
+            if (train_countdown / 100 > 0) {
+                train.children[train_countdown / 100 + 1].visible = true;
+
+                if (train_countdown / 100 < 10) {
+                    train.children[train_countdown / 100 + 2].visible = false;
+                }
+            }
+            else {
+                train.children[train_countdown / 100 + 1].visible = false;
+                train.children[train_countdown / 100 + 2].visible = false;
+            }
+        }
+    }
+
+    if (startMoving) {
+        stepStartTimestamp = timestamp;
+        startMoving = false;
+    }
+
+    if (stepStartTimestamp) {
+        moveDeltaTime = timestamp - stepStartTimestamp;
+        moveDeltaDistance = Math.min(moveDeltaTime / stepTime, 1) * positionWidth * zoom;
+        jumpDeltaDistance = Math.sin(Math.min(moveDeltaTime / stepTime, 1) * Math.PI) * 8 * zoom;
+        // console.log("moves[0]", moves[0]);
+        switch (moves[0]) {
+            case 'forward': {
+                positionY = currentLane * positionWidth * zoom + moveDeltaDistance;
+                // dirLight.position.y = initialDirLightPositionY + positionY;
+                player.position.y = positionY;
+                player.position.z = jumpDeltaDistance;
+                player.rotation.z = Math.PI / 2;
+                break;
+            }
+            case 'backward': {
+                positionY = currentLane * positionWidth * zoom - moveDeltaDistance
+                // dirLight.position.y = initialDirLightPositionY + positionY;
+                player.position.y = positionY;
+                player.position.z = jumpDeltaDistance;
+                player.rotation.z = -Math.PI / 2;
+                break;
+            }
+            case 'left': {
+                positionX = (currentColumn * positionWidth) * zoom - moveDeltaDistance;
+                // dirLight.position.x = initialDirLightPositionX + positionX;
+                player.position.x = positionX; // initial player position is 0
+                player.position.z = jumpDeltaDistance;
+                player.rotation.z = Math.PI;
+                break;
+            }
+            case 'right': {
+                positionX = (currentColumn * positionWidth) * zoom + moveDeltaDistance;
+                // dirLight.position.x = initialDirLightPositionX + positionX;
+                player.position.x = positionX;
+                player.position.z = jumpDeltaDistance;
+                player.rotation.z = 0;
+                break;
+            }
+        }
+        // console.log("moves_players", moves_players);
+        // Players move
+        // let counter = 0;
+        // for (let move_data of moves_players) {
+        let move_data = moves_players[0];
+        // counter++;
+        if (move_data != null) {
+            // console.log("move_data", move_data);
+            // console.log("players[move_data.userId]", players[move_data.userId]);
+            switch (move_data.direction) {
+                case 'forward': {
+                    players[move_data.userId].position.y += positionWidth * zoom + moveDeltaDistance;
+                    players[move_data.userId].position.z = jumpDeltaDistance;
+                    break;
+                }
+                case 'backward': {
+                    players[move_data.userId].position.y -= positionWidth * zoom + moveDeltaDistance;
+                    players[move_data.userId].position.z = jumpDeltaDistance;
+                    break;
+                }
+                case 'left': {
+                    players[move_data.userId].position.x -= positionWidth * zoom + moveDeltaDistance;
+                    players[move_data.userId].position.z = jumpDeltaDistance;
+                    break;
+                }
+                case 'right': {
+                    players[move_data.userId].position.x += positionWidth * zoom + moveDeltaDistance;
+                    players[move_data.userId].position.z = jumpDeltaDistance;
+                    break;
+                }
+            }
+
+            moves_players.shift();
+        }
+        // }
+
+        // Once a step has ended
+        if (moveDeltaTime > stepTime) {
+            switch (moves[0]) {
+                case 'forward': {
+                    currentLane++;
+                    break;
+                }
+                case 'backward': {
+                    currentLane--;
+                    break;
+                }
+                case 'left': {
+                    currentColumn--;
+                    break;
+                }
+                case 'right': {
+                    currentColumn++;
+                    break;
+                }
+            }
+            moves.shift();
+            // If more steps are to be taken then restart counter otherwise stop stepping
+            stepStartTimestamp = moves.length === 0 ? null : timestamp;
+        }
+    }
+    else {
+
+
+        if (directions[0] != null) {
+            console.log("directions[0]", directions[0]);
+            switch (directions[0]) {
+                case 'forward': {
+                    player.rotation.z = Math.PI / 2;
+                    break;
+                }
+                case 'backward': {
+                    player.rotation.z = -Math.PI / 2;
+                    break;
+                }
+                case 'left': {
+                    player.rotation.z = Math.PI;
+                    break;
+                }
+                case 'right': {
+                    player.rotation.z = 0;
+                    break;
+                }
+            }
+            directions.shift();
+        }
+    }
+
+    // if (lanes[currentLane].type === 'car' || lanes[currentLane].type === 'truck') {
+    //     playerMinX = player.position.x - playerSize * zoom / 2;
+    //     playerMaxX = player.position.x + playerSize * zoom / 2;
+    //     vechicleLength = { car: 60, truck: 105 }[lanes[currentLane].type];
+    //     lanes[currentLane].vechicles.forEach(vechicle => {
+    //         carMinX = vechicle.position.x - vechicleLength * zoom / 2;
+    //         carMaxX = vechicle.position.x + vechicleLength * zoom / 2;
+    //         if (playerMaxX > carMinX && playerMinX < carMaxX) {
+    //             endDOM.style.visibility = 'visible';
+    //         }
+    //     });
+
+    // }
+    renderer.render(scene, camera);
+    stats.update();
+}
+
+
+function start() {
+    started = true;
+    console.log("start");
+}
+
+function init() {
+
+    stats = createStats();
+    document.body.appendChild(stats.domElement);
+
+    // initialCameraPositionX += (currentColumn * positionWidth) * zoom;
+    initialCameraPositionY += 400;
+    initialCameraPositionX += 300;
+    camera.position.y = initialCameraPositionX;
+    camera.position.x = initialCameraPositionY;
+    camera.position.z = distance;
+
+    currentLane = 3;
+    currentColumn = columns / 2;
+
+    hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+    scene.add(hemiLight);
+
+    dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    dirLight.position.set(initialDirLightPositionX, initialDirLightPositionY, 400);
+    dirLight.castShadow = true;
+    scene.add(dirLight);
+
+    dirLight.shadow.mapSize.width = 2048;
+    dirLight.shadow.mapSize.height = 2048;
+    var d = 800;
+    dirLight.shadow.camera.left = d;
+    dirLight.shadow.camera.right = -d;
+    dirLight.shadow.camera.top = -d;
+    dirLight.shadow.camera.bottom = d;
+
+    // var helper = new THREE.CameraHelper( dirLight.shadow.camera );
+    // var helper = new THREE.CameraHelper( camera );
+    // scene.add(helper)
+
+    backLight = new THREE.DirectionalLight(0x000000, .4);
+    backLight.position.set(200, 200, 50);
+    backLight.castShadow = true;
+}
+
+window.addEventListener("DOMContentLoaded", (event) => {
+    init();
+    initaliseValues();
+    updateCounter();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+    window.scene = scene;
+    window.THREE = THREE;
+});
+
